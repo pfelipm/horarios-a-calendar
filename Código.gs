@@ -5,7 +5,7 @@
  * Columna N: Hora de fin de la clase.
  * @param {A1:G13} horario Intervalo de datos que contiene el horario.
  * @param {FALSO} agrupar Indica si se deben tratar de agrupar las clases que se repiten
- *                a lo largo de la semana en el mismo horario.
+ *                a lo largo de la semana en el mismo horario (aún no implementado).
  * @return Tabla de clases.
  *
  * @CustomFunction
@@ -16,7 +16,7 @@
 
 function EXTRAERCLASES(horario, agrupar = false) {
   
-  // Comprobar parámetros
+  // Comprobar parámetros (implementar)
   
   // Inicializaciones varias
   
@@ -54,7 +54,9 @@ function EXTRAERCLASES(horario, agrupar = false) {
     eventos.push(eventoActual);
   }
   
-  // Etapa 2: Agrupar eventos que se repiten en varios días a la semana
+  // Etapa 2: Agrupar eventos que se repiten en varios días a la semana (implementar)
+  
+  if (agrupar) {}
   
   // Generar matriz resultado
     
