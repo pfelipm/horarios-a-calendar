@@ -31,7 +31,7 @@ function EXTRAERCLASES(horario, agrupar = false) {
     
     // Primera clase del día
     
-    let eventoActual = {desc: horario[1][dia], dia: horario[0][dia], hInicio: horario[1][0], hFin: horario[1][horario[0].length - 1] };
+    let eventoActual = {desc: horario[1][dia], dia: horario[0][dia], hInicio: horario[1][0], hFin: horario[1][horario[0].length - 1]};
     
     for (let franjaHoraria = 2; franjaHoraria <= numFranjas ; franjaHoraria++){
       
