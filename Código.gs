@@ -3,12 +3,15 @@
  * Fila 1: Días de la semana.
  * Columna 1: Hora de inicio de la clase.
  * Columna N: Hora de fin de la clase.
- @param {A1:G13} horario Intervalo de datos que contiene el horario.
- @param {FALSO} agrupar Indica si se deben tratar de agrupar las clases que se repiten
-                a lo largo de la semana en el mismo horario.
- @return Tabla de clases.
+ * @param {A1:G13} horario Intervalo de datos que contiene el horario.
+ * @param {FALSO} agrupar Indica si se deben tratar de agrupar las clases que se repiten
+ *                a lo largo de la semana en el mismo horario.
+ * @return Tabla de clases.
  *
  * @CustomFunction
+ *
+ * MIT License
+ * Copyright (c) 2020 Pablo Felip Monferrer(@pfelipm)
  */
 
 function EXTRAERCLASES(horario, agrupar = false) {
