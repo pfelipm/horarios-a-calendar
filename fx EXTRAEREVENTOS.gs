@@ -1,13 +1,14 @@
 /**
  * Extrae los eventos (clases) a partir de un horario representado en un rango especificado
- * Fila 1: Etiquetas de cada sesión, típicamente los días de la semana.
- * Columna 1: Hora de inicio de la clase.
- * Columna N: Hora de fin de la clase.
- * @param {A1:G13} horario Intervalo de datos que contiene el horario.
+ * @param {A1:G13} horario Intervalo de datos que contiene el horario:
+ *                         [Fila 1]: Etiqueta de cada sesión, típicamente los días de la semana.
+ *                         [Columna inicial]: Hora de inicio del evento.
+ *                         [Columna final]: Hora de fin del evento.
+ *                         [Celdas interiores]: Descripción del evento.
  * @param {FALSO} agrupar Indica si se deben tratar de agrupar los eventos que se repiten
- *                        a lo largo de la semana en el mismo horario (VERDADERO | [FALSO]).
+ *                        a lo largo de la semana en el mismo horario (VERDADERO | FALSO).
                           Si se omite se asume FALSO.
- * @param {'-'} separador SSecuencia de caracteres utilizada para separar la etiqueta de cada sesión,
+ * @param {'-'} separador Secuencia de caracteres utilizada para separar la etiqueta de cada sesión,
  *                        en el caso de que se haya solicitado su agrupación. Si se omite se
  *                        concatenan las etiquetas sin más.
  * @return Tabla de clases.
