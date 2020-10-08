@@ -8,8 +8,8 @@ Un tinglado Google Apps Script que automatiza la creación y gestión de evento
 
 # Fases
 
-1.  ☑️ Definir horario semanal en filas y columnas de una tabla.
-2.  ☑️ Extraer los eventos utilizando la función de hojas de cálculo personalizada `EXTRAEREVENTOS()`, permitiendo la agrupación de instancias de la misma actividad que se repiten en el mismo horario a lo largo de la semana. Utiliza la función `ACOPLAR()` para agrupar eventos en horarios semanales coincidentes, tal y como se describe en el [repositorio desacoplar-acoplar](https://github.com/pfelipm/desacoplar-acoplar).
+1.  ✅ Definir horario semanal en filas y columnas de una tabla.
+2.  ✅ Extraer los eventos utilizando la función de hojas de cálculo personalizada `EXTRAEREVENTOS()`, permitiendo la agrupación de instancias de la misma actividad que se repiten en el mismo horario a lo largo de la semana. Utiliza la función `ACOPLAR()` para agrupar eventos en horarios semanales coincidentes, tal y como se describe en el [repositorio desacoplar-acoplar](https://github.com/pfelipm/desacoplar-acoplar).
 3.  Integrar eventos en una tabla de gestión que posibilite su administración y gestión automatizada (no generar, eliminar, modificar, etc.).
 4.  Generar eventos en calendar a partir de la tabla anterior mediante script activado desde menú de la hoja de cálculo.
 
