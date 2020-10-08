@@ -17,7 +17,7 @@ Partiendo de una tabla - horario en un hoja de cálculo:
 # Fx personalizada EXTRAEREVENTOS()
 
 ```
-=EXTRAEREVENTOS( intervalo_horario ; [agrupar]; [separador] )
+=EXTRAEREVENTOS( intervalo_horario ; [agrupar]; [separador] ) 
 ```
 
 *   `intervalo_horario`: Intervalo de datos que contiene el horario en el formato requerido: fila 1 (etiqueta de cada sesión, típicamente los **días de la semana**), columna inicial (**hora de inicio del evento**), columna final (**hora de fin del evento**), celdas (**descripción del evento**):
@@ -30,7 +30,7 @@ Partiendo de una tabla - horario en un hoja de cálculo:
 Ejemplo:
 
 ```
-=EXTRAEREVENTOS( A1:G13 ; VERDADERO ; "-" )
+=EXTRAEREVENTOS( A1:G13 ; VERDADERO ; "-" ) 
 ```
 
 ![extraereventodemo](https://user-images.githubusercontent.com/12829262/95462129-64183b80-0977-11eb-8a67-1eb50234893a.png)
