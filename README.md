@@ -1,6 +1,6 @@
 # Horarios-a-Calendar
 
-Un conjunto de scripts GAS para automatizar la creación  y gestión de eventos en Google Calendar para representar las clases a partir de una definición de horaria en formato tabla en una hoja de cálculo de Google.
+Un tinglado Google Apps Script que automatiza la creación  y gestión de eventos en Google Calendar para representar las clases a partir de una definición horaria en formato tabla en una hoja de cálculo de Google.
 
 **⚒️ En construcción** ⚒️
 
