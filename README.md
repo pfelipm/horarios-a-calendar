@@ -29,7 +29,7 @@ Un tinglado Google Apps Script que automatiza la creación y gestión de evento
 Ejemplo:
 
 ```
-=EXTRAEREVENTOS( A1:G13 ; VERDADERO ; "/" )
+=EXTRAEREVENTOS( A1:G13 ; VERDADERO ; "-" )
 ```
 
 ![extraereventodemo](https://user-images.githubusercontent.com/12829262/95462129-64183b80-0977-11eb-8a67-1eb50234893a.png)
