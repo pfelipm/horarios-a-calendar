@@ -14,7 +14,7 @@
  * Copyright (c) 2020 Pablo Felip Monferrer(@pfelipm)
  */
 
-function EXTRAERCLASES(horario, agrupar = false) {
+function EXTRAEREVENTOS(horario, agrupar = false) {
   
   // Comprobar parámetros (implementar)
   
@@ -69,7 +69,7 @@ function EXTRAERCLASES(horario, agrupar = false) {
   
   if (agrupar) {
     
-    eventos = ACOPLAR(eventos, false, ",", 1, 3, 4);
+    eventos = ACOPLAR(eventos, false, "", 1, 3, 4);
   
   }
   

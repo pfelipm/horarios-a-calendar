@@ -23,7 +23,7 @@ function ACOPLAR(intervalo, encabezado, separador, columna, ...masColumnas) {
   if (typeof intervalo == 'undefined' || !Array.isArray(intervalo)) throw 'No se ha indicado un intervalo.';
   if (typeof encabezado != 'boolean') encabezado = true;
   if (intervalo.length == 1 && encabezado) throw 'El intervalo es demasiado pequeño, añade más filas.';
-  separador = separador || ', ';
+  //separador = separador || ', '; // Permitir excepcionalemnte cadena vacía como separador ""
   if (typeof separador != 'string') throw 'El separador no es del tipo correcto.';
   let columnas = typeof columna != 'undefined' ? [columna, ...masColumnas].sort() : [...masColumnas].sort();
   if (columnas.length == 0) throw 'No se han indicado columnas clave.';
