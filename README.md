@@ -1,3 +1,4 @@
+![Banner horarios-a-calendar](https://user-images.githubusercontent.com/12829262/95454414-b43dd080-096c-11eb-99d1-854f66187e81.png)
 # Horarios-a-Calendar
 
 Un tinglado Google Apps Script que automatiza la creación y gestión de eventos en Google Calendar para representar los eventos (clases en un contexto de enseñanza) a partir de una definición horaria en formato tabla en una hoja de cálculo de Google.
