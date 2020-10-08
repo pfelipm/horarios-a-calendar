@@ -1,5 +1,5 @@
 /**
- * Extrae los eventos (clases) a partir de un horario representado en un rango especificado
+ * Extrae los eventos (clases) a partir de un horario representado en la  tabla en el intervalo de datos especificado.
  * @param {A1:G13} horario Intervalo de datos que contiene el horario:
  *                         [Fila 1]: Etiqueta de cada sesión, típicamente los días de la semana.
  *                         [Columna inicial]: Hora de inicio del evento.
