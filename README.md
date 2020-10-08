@@ -6,7 +6,7 @@ Un tinglado Google Apps Script que automatiza la creación y gestión de evento
 
 **⚒️ En construcción** ⚒️
 
-# Fases
+# Hoja de ruta
 
 Partiendo de una tabla en una hoja de cálculo con el horario de partida:
 
