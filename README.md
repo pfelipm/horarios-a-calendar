@@ -11,7 +11,7 @@ Un tinglado Google Apps Script que automatiza la creación y gestión de evento
 Partiendo de una tabla en una hoja de cálculo con el horario de partida:
 
 1.  ✔️ Extraer los eventos (clases) utilizando la función de hojas de cálculo personalizada `EXTRAEREVENTOS()`, permitiendo la agrupación de las instancias de cada actividad que se repitan en el mismo horario a lo largo de la semana. Utiliza la función `ACOPLAR()` para agrupar eventos en horarios semanales coincidentes, tal y como se describe en el [repositorio desacoplar-acoplar](https://github.com/pfelipm/desacoplar-acoplar).
-2.  ⚒️ Integrar eventos en una panel de gestión que posibilite su administración y gestión automatizada (no generar, eliminar, modificar, etc.).
+2.  ⚒️ Integrar eventos en una panel de gestión que posibilite su administración y gestión automatizada (generar, eliminar, actualizar, etc.).
 3.  ⚒️ Generar eventos en calendar a partir de la tabla anterior mediante script activado desde menú de la hoja de cálculo.
 
 # Fx personalizada EXTRAEREVENTOS()
