@@ -22,3 +22,11 @@ Un conjunto de scripts GAS para automatizar la creación  y gestión de eventos
 <table><tbody><tr><td>&nbsp;</td><td>L</td><td>M</td><td>X</td><td>J</td><td>V</td><td>&nbsp;</td></tr><tr><td>H inicio</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>H Fin</td></tr><tr><td>...</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>...</td></tr><tr><td>H inicio</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>H Fin</td></tr></tbody></table>
 
 *   `agrupar`: Indica si se deben tratar de agrupar los eventos que se repiten a lo largo de la semana en el mismo horario (`VERDADERO` o `FALSO`). Si se omite se asume `FALSO`.
+
+Ejemplo:
+
+```
+=EXTRAEREVENTOS( A1:G13 ; VERDADERO )
+```
+
+![](https://user-images.githubusercontent.com/12829262/95442630-eabf1f80-095b-11eb-8fe7-d4c2a1e0c144.png)
