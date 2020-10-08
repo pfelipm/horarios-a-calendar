@@ -11,8 +11,14 @@ Un conjunto de scripts GAS para automatizar la creación  y gestión de eventos
 3.  Integrar eventos en tabla de gestión que posibilite su administración y gestión automatizada (no generar, eliminar, modificar, etc.).
 4.  Generar eventos en calendar a partir de la tabla anterior mediante script activado desde menú de la hoja de cálculo.
 
-# Fx personalizada EXTRAEREVENTOS
+# Fx personalizada EXTRAEREVENTOS()
 
 ```
-=EXTRAEREVENTOS( intervalo_horario ; [agrupar])
+=EXTRAEREVENTOS( intervalo_horario ; [agrupar] )
 ```
+
+*   `intervalo_horario`: Intervalo de datos que contiene el horario en el formato requerido:
+    *   Fila 1: Días de la semana.
+    *   Columna 1: Hora de inicio de la clase.
+    *   Columna N: Hora de fin de la clase.
+*   `agrupar`: Indica si se deben tratar de agrupar los eventos que se repiten a lo largo de la semana en el mismo horario (`VERDADERO` o `FALSO`). Si se omite se asume `FALSO`.
