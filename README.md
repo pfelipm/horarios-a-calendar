@@ -17,7 +17,7 @@ Un conjunto de scripts GAS para automatizar la creación  y gestión de eventos
 =EXTRAEREVENTOS( intervalo_horario ; [agrupar] )
 ```
 
-*   `intervalo_horario`: Intervalo de datos que contiene el horario en el formato requerido: Fila 1 (días de la semana), columna inicial (hora de inicio del evento), columna final (hora de fin del evento):
+*   `intervalo_horario`: Intervalo de datos que contiene el horario en el formato requerido: Fila 1 (días de la semana), columna inicial (hora de inicio del evento), columna final (hora de fin del evento), celdas (descripción del evento):
 
 <table><tbody><tr><td>&nbsp;</td><td>L</td><td>M</td><td>X</td><td>J</td><td>V</td><td>&nbsp;</td></tr><tr><td>H inicio</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>H Fin</td></tr><tr><td>...</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>...</td></tr><tr><td>H inicio</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>Descripción</td><td>H Fin</td></tr></tbody></table>
 
