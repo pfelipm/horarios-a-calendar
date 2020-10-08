@@ -34,3 +34,7 @@ Ejemplo:
 ```
 
 ![extraereventodemo](https://user-images.githubusercontent.com/12829262/95462129-64183b80-0977-11eb-8a67-1eb50234893a.png)
+
+# **Modo de uso**
+
+Para usar `EXTRAEREVENTOS()` en tus proyectos, abre el editor GAS de tu hoja de cálculo (`Herramientas` **⇒** `Editor de secuencias de comandos`), pega el código que encontrarás dentro de los archivos `fx ACOPLAR.gs` y `fx EXTRAEREVENTOS.g`s de este repositorio y guarda los cambios. Debes asegurarte de que se esté utilizando el nuevo motor GAS JavaScript V8 (`Ejecutar` **⇒** `Habilitar ... V8`).
