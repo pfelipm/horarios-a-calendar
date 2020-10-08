@@ -5,7 +5,10 @@
  * Columna N: Hora de fin de la clase.
  * @param {A1:G13} horario Intervalo de datos que contiene el horario.
  * @param {FALSO} agrupar Indica si se deben tratar de agrupar las clases que se repiten
- *                a lo largo de la semana en el mismo horario ([VERDADERO] | FALSO).
+ *                        a lo largo de la semana en el mismo horario ([VERDADERO] | FALSO).
+ * @param {'-'} separador Secuencia de caracteres que separa las ocurrencias de cada evento,
+ *                        en el caso de que se haya solicitado su agrupación. Si se omite se
+ *                        utiliza "" (sin separador).
  * @return Tabla de clases.
  *
  * @CustomFunction
@@ -14,12 +17,13 @@
  * Copyright (c) 2020 Pablo Felip Monferrer(@pfelipm)
  */
 
-function EXTRAEREVENTOS(horario, agrupar = false) {
+function EXTRAEREVENTOS(horario, agrupar = false, separador = '') {
   
   // Comprobar parámetros (implementar)
   
-   if (!Array.isArray(horario)) throw 'No se ha indicado un intervalo de datos o no es del tipo correcto.';
-   if (typeof agrupar != 'boolean') throw('El parámetro "agrupar" debe ser VERDADERO o FALSO');
+  if (!Array.isArray(horario)) throw 'No se ha indicado un intervalo de datos o no es del tipo correcto.';
+  if (typeof agrupar != 'boolean') throw('El parámetro "agrupar" debe ser VERDADERO o FALSO');
+  if (typeof separador != 'string') throw 'El separador no es del tipo correcto.';
   
   // Inicializaciones varias
   
@@ -69,7 +73,7 @@ function EXTRAEREVENTOS(horario, agrupar = false) {
   
   if (agrupar) {
     
-    eventos = ACOPLAR(eventos, false, "", 1, 3, 4);
+    eventos = ACOPLAR(eventos, false, separador, 1, 3, 4);
   
   }
   
