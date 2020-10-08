@@ -7,9 +7,9 @@
  * @param {FALSO} agrupar Indica si se deben tratar de agrupar los eventos que se repiten
  *                        a lo largo de la semana en el mismo horario (VERDADERO | [FALSO]).
                           Si se omite se asume FALSO.
- * @param {'-'} separador Secuencia de caracteres que separa las ocurrencias de cada evento,
+ * @param {'-'} separador SSecuencia de caracteres utilizada para separar la etiqueta de cada sesión,
  *                        en el caso de que se haya solicitado su agrupación. Si se omite se
-                          concatenan las etiquetas sin más.
+ *                        concatenan las etiquetas sin más.
  * @return Tabla de clases.
  *
  * @CustomFunction
