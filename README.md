@@ -22,7 +22,11 @@ Partiendo de una tabla - horario en un hoja de cálculo:
 
 *   `intervalo_horario`: Intervalo de datos que contiene el horario en el formato requerido: fila 1 (etiqueta de cada sesión, típicamente los **días de la semana**), columna inicial (**hora de inicio del evento**), columna final (**hora de fin del evento**), celdas (**descripción del evento**):
 
-<table><tbody><tr><td>&nbsp;</td><td><strong>L</strong></td><td><strong>M</strong></td><td><strong>X</strong></td><td><strong>J</strong></td><td><strong>V</strong></td><td>&nbsp;</td></tr><tr><td><strong>H inicio</strong></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><strong>H Fin</strong></td></tr><tr><td><strong>...</strong></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><strong>...</strong></td></tr><tr><td><strong>H inicio</strong></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><i>Descripción</i></td><td><strong>H Fin</strong></td></tr></tbody></table>
+|   | **L** | **M** | **X** | **J** | **V** |   |
+| --- | --- | --- | --- | --- | --- | --- |
+| **H inicio** | _Descripción_ | _Descripción_ | _Descripción_ | _Descripción_ | _Descripción_ | **H Fin** |
+| **...** | _Descripción_ | _Descripción_ | _Descripción_ | _Descripción_ | _Descripción_ | **...** |
+| **H inicio** | _Descripción_ | _Descripción_ | _Descripción_ | _Descripción_ | _Descripción_ | **H Fin** |
 
 *   `agrupar`: Indica si se deben tratar de agrupar los eventos que se repiten a lo largo de la semana en el mismo horario (`VERDADERO` o `FALSO`). Si se omite se asume `FALSO`.
 *   `separador`: Secuencia de caracteres utilizada para separar la etiqueta de cada sesión en el caso de que se haya solicitado la agrupación de eventos. Si se omite se concatenan las etiquetas sin más.
