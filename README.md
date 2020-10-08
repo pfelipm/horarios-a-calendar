@@ -12,7 +12,7 @@ Partiendo de una tabla en una hoja de cálculo con el horario de partida:
 
 1.  ✔️ Extraer los eventos (clases) utilizando la función de hojas de cálculo personalizada `EXTRAEREVENTOS()`, permitiendo la agrupación de las instancias de cada actividad que se repitan en el mismo horario a lo largo de la semana. Utiliza la función `ACOPLAR()` para agrupar eventos en horarios semanales coincidentes, tal y como se describe en el [repositorio desacoplar-acoplar](https://github.com/pfelipm/desacoplar-acoplar).
 2.  ⚒️ Integrar eventos en una panel de gestión que posibilite su administración y gestión automatizada (generar, eliminar, actualizar, etc.).
-3.  ⚒️ Generar eventos en Google Calendar 🗓️ a partir de la tabla anterior mediante script activado desde menú de la hoja de cálculo.
+3.  ⚒️ Generar eventos en Google Calendar 🗓️ a partir de la tabla anterior mediante un script activado desde el menú de la hoja de cálculo (o tal vez con ejecución periódica).
 
 # Fx personalizada EXTRAEREVENTOS()
 
