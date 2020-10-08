@@ -7,6 +7,6 @@ Un conjunto de scripts GAS para automatizar la creación  y gestión de eventos
 # Fases
 
 1.  ✔️ Definir horario semanal en filas y columnas de una tabla.
-2.  ✔️ Extraer los eventos utilizando una función de hojas de cálculo personalizada (`EXTRAEREVENTOS`).
+2.  ✔️ Extraer los eventos utilizando una función de hojas de cálculo personalizada (`EXTRAEREVENTOS`), permitiendo la agrupación de instancias de la misma actividad que se repiten en el mismo horario a lo largo de la semana.
 3.  Integrar eventos en tabla de gestión que posibilite su administración y gestión automatizada (no generar, eliminar, modificar, etc.).
 4.  Generar eventos en calendar a partir de la tabla anterior mediante script activado desde menú de la hoja de cálculo.
