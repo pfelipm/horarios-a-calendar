@@ -71,7 +71,7 @@ function EXTRAEREVENTOS(horario, agrupar = false, separador = '') {
   
   eventos = eventos.map(evento => [evento.desc, evento.dia, evento.hInicio, evento.hFin]);
   
-  // Etapa 2: Agrupar eventos que se repiten en varios días a la semana (implementar)
+  // Etapa 2: Agrupar eventos que se repiten en varios días a la semana (utiliza fx ACOPLAR)
   
   if (agrupar) {
     
