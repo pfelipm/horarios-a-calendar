@@ -7,41 +7,50 @@
  * de salas del dominio
  */
 function m_ObtenerSalas() {
-  
-  mostrarMensaje('Buscando salas en el dominio...');
 
-  hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.salas.hoja);
-  const salas = obtenerSalas().map(recurso =>
-    [
-      recurso.resourceName,
-      recurso.generatedResourceName,
-      recurso.resourceType,
-      recurso.userVisibleDescription,
-      recurso.resourceEmail
-    ]
-  );
+  if (alerta('Se sobreescribirán las salas existentes') == SpreadsheetApp.getUi().Button.OK) {
 
-  if (salas.length > 0) {
+    
+    mostrarMensaje('Buscando salas en el dominio...');
 
-    hoja.getDataRange().offset(PARAM.salas.filaEncabezado,0).clearContent();
-    hoja.getRange(PARAM.salas.filaEncabezado + 1,PARAM.salas.colDatos, salas.length, salas[0].length)
-      .setValues(salas);
+    hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.salas.hoja).activate();
+    const salas = obtenerSalas().map(recurso =>
+      [
+        recurso.resourceName,
+        recurso.generatedResourceName,
+        recurso.resourceType,
+        recurso.userVisibleDescription,
+        recurso.resourceEmail
+      ]
+    );
+
+    if (salas && salas.length > 0) {
+      
+      // Escribe datos en la tabla (hoja)
+      actualizarDatosTabla(hoja, salas, PARAM.salas.filaEncabezado + 1, PARAM.salas.colDatos);
+      
+      // Eliminar filas sobrantes y mostrar mensajes de resultado
+      reducirHoja(hoja);
+      hoja.getRange(PARAM.salas.ultEjecucion).setValue(new Date());
+      mostrarMensaje(`Se han obtenido ${salas.length} salas.`,5);
+
+    } else mostrarMensaje('No se han encontrado salas.',5);
 
   }
-
-  mostrarMensaje(`Se han obtenido ${salas.length} salas.`,5);
 
 }
 
 /**
  * Devuelve una lista de los recursos del dominio de tipo 'CONFERENCE_ROOM'.
- * @return  {Array<CalendarResource>}
+ * @return {Array<AdminDirectory.CalendarResource>} Lista de salas
  */
 function obtenerSalas() {
 
   let recursos = [];
   let pageToken;
+  
   do {
+
     const respuesta = AdminDirectory.Resources.Calendars.list('my_customer',
       {
         maxResults: 100,
@@ -53,6 +62,7 @@ function obtenerSalas() {
       recursos = recursos.concat(respuesta.items);
       pageToken = respuesta.nextPageToken;
     }
+  
   } while (pageToken);
 
   return recursos;

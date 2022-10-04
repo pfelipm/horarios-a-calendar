@@ -20,67 +20,65 @@
  */
 
 function EXTRAEREVENTOS(horario, agrupar = false, separador = '') {
-  
+
   // Comprobar parámetros (implementar)
-  
+
   if (!Array.isArray(horario)) throw 'No se ha indicado un intervalo de datos o no es del tipo correcto.';
-  if (typeof agrupar != 'boolean') throw('El parámetro "agrupar" debe ser VERDADERO o FALSO');
+  if (typeof agrupar != 'boolean') throw ('El parámetro "agrupar" debe ser VERDADERO o FALSO');
   if (typeof separador != 'string') throw 'El separador no es del tipo correcto.';
-  
+
   // Inicializaciones varias
-  
+
   const numDias = horario[0].length - 2;
   const numFranjas = horario.length - 1;
   let eventos = [];
   let tablaEventos = [];
-  
+
   // Etapa 1: identificar eventos
- 
-  for (let dia = 1; dia <= numDias; dia++){
-    
+
+  for (let dia = 1; dia <= numDias; dia++) {
+
     // Primera clase del día
-    
-    let eventoActual = {desc: horario[1][dia],
-                        dia: horario[0][dia],
-                        hInicio: horario[1][0],
-                        hFin: horario[1][horario[0].length - 1],
-                       };
-    
-    for (let franjaHoraria = 2; franjaHoraria <= numFranjas ; franjaHoraria++){
-      
+
+    let eventoActual = {
+      desc: horario[1][dia],
+      dia: horario[0][dia],
+      hInicio: horario[1][0],
+      hFin: horario[1][horario[0].length - 1],
+    };
+
+    for (let franjaHoraria = 2; franjaHoraria <= numFranjas; franjaHoraria++) {
+
       if (eventoActual.desc == horario[franjaHoraria][dia]) eventoActual.hFin = horario[franjaHoraria][horario[0].length - 1];
       else {
- 
+
         // Añadir evento
-          
-         eventos.push(eventoActual);
-         eventoActual = {desc: horario[franjaHoraria][dia],
-                         dia: horario[0][dia],
-                         hInicio: horario[franjaHoraria][0],
-                         hFin: horario[franjaHoraria][horario[0].length - 1],
-                        };
+
+        eventos.push(eventoActual);
+        eventoActual = {
+          desc: horario[franjaHoraria][dia],
+          dia: horario[0][dia],
+          hInicio: horario[franjaHoraria][0],
+          hFin: horario[franjaHoraria][horario[0].length - 1],
+        };
       }
     }
-    
+
     // Registrar el último evento del día
-    
+
     eventos.push(eventoActual);
   }
-  
+
   // Convertir a matriz
-  
+
   eventos = eventos.map(evento => [evento.desc, evento.dia, evento.hInicio, evento.hFin]);
-  
+
   // Etapa 2: Agrupar eventos que se repiten en varios días a la semana (utiliza fx ACOPLAR)
-  
-  if (agrupar) {
-    
-    eventos = ACOPLAR(eventos, false, separador, 1, 3, 4);
-  
-  }
-  
-  // Generar matriz resultado
-    
-  return eventos;
-    
+
+  if (agrupar) eventos = ACOPLAR(eventos, false, separador, 1, 3, 4);
+
+  // Generar matriz resultado, se eliminan eventos surgidos a partir de celdas en blanco
+
+  return eventos.filter(evento => evento[0]);
+
 }
