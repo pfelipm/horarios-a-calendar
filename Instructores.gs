@@ -28,7 +28,7 @@ function m_ObtenerCalInstructores() {
       actualizarDatosTabla(
         hoja,
         calendarios.sort(([nombre1, id1], [nombre2, id2]) => nombre1.localeCompare(nombre2)),
-        PARAM.instructores.filaEncabezado + 1,
+        PARAM.instructores.filEncabezado + 1,
         PARAM.instructores.colNombreCal);
       
       // Eliminar filas sobrantes y mostrar mensajes de resultado

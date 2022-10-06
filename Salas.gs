@@ -27,7 +27,7 @@ function m_ObtenerSalas() {
     if (salas && salas.length > 0) {
       
       // Escribe datos en la tabla (hoja)
-      actualizarDatosTabla(hoja, salas, PARAM.salas.filaEncabezado + 1, PARAM.salas.colDatos);
+      actualizarDatosTabla(hoja, salas, PARAM.salas.filEncabezado + 1, PARAM.salas.colDatos);
       
       // Eliminar filas sobrantes y mostrar mensajes de resultado
       reducirHoja(hoja);
@@ -40,9 +40,11 @@ function m_ObtenerSalas() {
 
 }
 
+obtenerSalas()
+
 /**
  * Devuelve una lista de los recursos del dominio de tipo 'CONFERENCE_ROOM'.
- * @return {Array<AdminDirectory.CalendarResource>} Lista de salas
+ * @return {Array<Admin_directory_v1.Admin.Directory_v1.Schema.CalendarResource>} Lista de salas
  */
 function obtenerSalas() {
 

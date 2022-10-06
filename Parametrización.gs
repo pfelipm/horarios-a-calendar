@@ -24,7 +24,7 @@ const PARAM = {
   // Tabla de eventos
   eventos: {
     hoja: 'Eventos',
-    filaEncabezado: 4,
+    filEncabezado: 5,
     colCheck: 1,
     colGrupo: 2,
     colClase: 3,
@@ -44,7 +44,7 @@ const PARAM = {
   // Tabla de instructores
   instructores: {
     hoja: 'Instructores',
-    filaEncabezado: 4,
+    filEncabezado: 4,
     colIniciales: 2,
     colEmail: 3,
     colNombreCal: 4,
@@ -56,7 +56,7 @@ const PARAM = {
   // Tabla de salas (aulas)
   salas: {
     hoja: 'Salas',
-    filaEncabezado: 4,
+    filEncabezado: 4,
     colNombre: 1,
     colIdCal: 5,
     colDatos: 1,

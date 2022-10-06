@@ -36,7 +36,7 @@ function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = PARAM.nombreAp) {
  * como una [enumeración `Ui.Button`](https://developers.google.com/apps-script/reference/base/button).
  * 
  * @param   {string}    mensaje
- * @param   {ButtonSet} [botones] [Enumeración `Ui.ButtonSet`](https://developers.google.com/apps-script/reference/base/button-set)
+ * @param   {ButtonSet} [botones] [Enumeración `Ui.ButtonSet`](https://developers.google.com/apps-script/reference/base/button-set).
  * @param   {string}    [titulo]
  * 
  * @return  {Button}    Botón sobre el que se ha hecho clic    
@@ -52,8 +52,8 @@ function alerta(mensaje, botones = SpreadsheetApp.getUi().ButtonSet.OK_CANCEL, t
  * que se encuentran a partir de una fila y columnas iniciales dadas (se asumen 1 si se omiten).
  * 
  * @param   {SpreadsheetApp.Sheet}  hoja   
- * @param   {number}                [numFila]     Nº de fila, comenzando por 1 (se asume 1 si no se facilita)
- * @param   {number}                [numColumna]  Nº de columna, comenzando por 1 (se asume 1 si no se facilita)
+ * @param   {number}                [numFila]     Nº de fila, comenzando por 1 (se asume 1 si no se facilita).
+ * @param   {number}                [numColumna]  Nº de columna, comenzando por 1 (se asume 1 si no se facilita).
  * 
  * @return  {Array}                 Valores de las celdas de la tabla
  */
@@ -65,16 +65,17 @@ function leerDatosHoja(hoja, numFila = 1, numColumna = 1) {
 
 /**
  * Escribe los valores de una matriz en las celdas de una hoja a partir de una fila y columnas dadas
- * (se asumen 1 si se omiten), borrando previamente de manera opcional los valores y/o formato existentes.
- * Si no se establecen los parámetros opcionales `borrarDatos` y `borrarFormato` se borrarán únicamente
- * los valores previos. Si la matriz de datos a escribir es 'undefined' solo se borrarán las celdas, en su caso.
+ * (se asumen 1 si se omiten), borrando previamente de manera opcional los valores y/o formato existentes
+ * en la hoja. Si no se establecen los parámetros opcionales `borrarDatos` y `borrarFormato` se borrarán
+ * únicamente los valores previos. Si la matriz de datos a escribir es 'undefined' solo se efectuará el
+ * borrado de datos.
  * 
  * @param {SpreadsheetApp.Sheet}  hoja
- * @param {Array}                 matriz            `undefined` si no se desean escribir datos en la tabla
- * @param {number}                [numFila]         Nº de fila, comenzado por 1 (se asume 1 si no se facilita)
- * @param {number}                [numColumna]      Nº de columna, comenzado por 1 (se asume 1 si no se facilita)
- * @param {boolean}               [borrarDatos]     VERDADERO si se desean borrar los valores
- * @param {boolean}               [borrarFormato]   VERDADERO si se desean borrar formato y reglas de validación
+ * @param {Array}                 matriz            Pasar un valor `undefined` si solo se desea borrar la hoja.
+ * @param {number}                [numFila]         Nº de fila, comenzado por 1 (se asume 1 si no se facilita).
+ * @param {number}                [numColumna]      Nº de columna, comenzado por 1 (se asume 1 si no se facilita).
+ * @param {boolean}               [borrarDatos]     VERDADERO si se desean borrar los valores.
+ * @param {boolean}               [borrarFormato]   VERDADERO si se desean borrar formato y reglas de validación.
  */
 function actualizarDatosTabla(hoja, matriz, numFila = 1, numColumna = 1, borrarDatos = true, borrarFormato = false) {
 
@@ -95,33 +96,88 @@ function actualizarDatosTabla(hoja, matriz, numFila = 1, numColumna = 1, borrarD
  * devuelve el número de filas y/o columnas eliminadas dentro de
  * un objeto como `{ filas: number, columnas: number }`.
  * 
- * @param {SpreadsheetApp.Sheet}        hoja                  Hoja a reducir
- * @param {Object}                      [reducir]             Elementos a eliminar como `{ filas: boolean, columnas: boolean }`
- * @param {Boolean}                     reducir.filas
- * @param {Boolean}                     reducir.columnas
+ * @param   {SpreadsheetApp.Sheet}        hoja                  Hoja a reducir.
+ * @param   {Object}                      [reducir]             Elementos a eliminar como `{ filas: boolean, columnas: boolean }`.
+ * @param   {Boolean}                     reducir.filas
+ * @param   {Boolean}                     reducir.columnas
  *
- * @return {Object} eliminadas          Nº de F/C eliminadas
- * @return {number} eliminadas.filas
- * @return {number} eliminadas.columnas
+ * @return  {Object} eliminadas          Nº de F/C eliminadas
+ * @return  {number} eliminadas.filas
+ * @return  {number} eliminadas.columnas
  */
 function reducirHoja(hoja, reducir = { filas: true, columnas: false }) {
 
-  const nFilas = hoja.getLastRow();
-  const nMaxFilas = hoja.getMaxRows();
-  const nColumnas = hoja.getLastColumn();
-  const nMaxColumnas = hoja.getMaxColumns();
+  const numFilas = hoja.getLastRow();
+  const numMaxFilas = hoja.getMaxRows();
+  const numColumnas = hoja.getLastColumn();
+  const numMaxColumnas = hoja.getMaxColumns();
 
-  if (reducir.filas && nMaxFilas > nFilas) hoja.deleteRows(nFilas + 1, nMaxFilas - nFilas);
-  if (reducir.columnas && nMaxColumnas > nColumnas ) hoja.deleteColumns(nColumnas + 1, nMaxColumnas - nColumnas);
+  if (reducir.filas && numMaxFilas > numFilas) hoja.deleteRows(numFilas + 1, numMaxFilas - numFilas);
+  if (reducir.columnas && numMaxColumnas > numColumnas ) hoja.deleteColumns(numColumnas + 1, numMaxColumnas - numColumnas);
 
-  return { filas: nMaxFilas - nFilas, columnas: nMaxColumnas - nColumnas };
+  return { filas: numMaxFilas - numFilas, columnas: numMaxColumnas - numColumnas };
 
 }
 
-
-
-
+/**
+ * Envoltorio para la función `conmutarChecks()`, a la que invoca con los
+ * parámetros específicos correspondientes a un botón o comando de menú
+ * determinado para conmutar el estado de un intervalo de casillas de
+ * verificación.
+ */
 function botonCheckEventos() {
-  console.info(reducirHoja(SpreadsheetApp.getActive().getSheetByName('Instructores'), {}));
+
+conmutarChecks(
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.eventos.hoja),
+  PARAM.eventos.filEncabezado + 1,
+  PARAM.eventos.colCheck,
+  2);
+  
 }
 
+/**
+ * Conmuta el estado un conjunto de casillas de verificación, devuelve el nº
+ * de casillas de verificación que han sido actualizadas.
+ * 
+ * @param   {SpreadsheetApp.Sheet}  hoja            Hoja en la que se encuentra el intervalo con casillas de verificación.
+ * @param   {number}                filCheck        Nº de la fila en la que se encuentra la primera casillas de verificación.
+ * @param   {number}                colCheck        Nº de la columna donde se encuentran las casillas de verificación.
+ * @param   {number}                colDatos        Nº de la columna que se usa para determinar si hay datos en la fila.
+ * @param   {numFilas}              numFilas        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()`.
+ * @param   {string}                propiedadEstado Clave de las `ScriptProperties` en la que se guardará el estado actual de las casillas.
+ * 
+ * @return  {number}                                Número de casillas de verificación actualizadas.
+ */
+function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, propiedadEstado = 'estadoCheck01') {
+
+  numFilas = !numFilas ? hoja.getLastRow() - filCheck + 1 : numFilas;
+
+  // Uso el almacén del script porque puede administrarse desde el editor,
+  // pero lo adecuado es emplear el del documento (⚠️ imprescindible en un complemento).
+  const propiedadesDoc = PropertiesService.getScriptProperties();
+  const estado = JSON.parse(propiedadesDoc.getProperty(propiedadEstado)); 
+  let numCheckActivos;
+
+  if (colDatos > 1) {
+
+    const rangoExisten = hoja.getRange(filCheck, colCheck + 1, numFilas);
+    const existen = rangoExisten.getValues();
+    numCheckActivos = existen.length - existen.reverse().findIndex(el => el[0] != '');
+  
+  } else numCheckActivos = numFilas;
+
+  if (numCheckActivos > 0) {
+
+    if (estado) {
+      hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(false);
+      propiedadesDoc.setProperty(propiedadEstado,false);
+    } else {
+      hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(true);
+      propiedadesDoc.setProperty(propiedadEstado, true)
+    }
+  
+  }
+
+  return numCheckActivos;
+
+}
