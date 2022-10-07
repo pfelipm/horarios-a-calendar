@@ -19,12 +19,15 @@ const T_CAL_PROF = 'O3:Q11';
 const T_CAL_AULA = 'S3:T11';
 
 const PARAM = {
-  nombreApp : 'HaC',
+  nombre: 'HaC',
+  version: 'Versión 1.0 (octubre 2022)',
+  icono: '🗓️',
+  urlRepoGitHub: 'https://github.com/pfelipm/horarios-a-calendar',
 
   // Tabla de eventos
   eventos: {
-    hoja: 'Eventos',
-    filEncabezado: 5,
+    hoja: 'Gestión eventos',
+    filEncabezado: 6,
     colCheck: 1,
     colGrupo: 2,
     colClase: 3,
@@ -44,7 +47,7 @@ const PARAM = {
   // Tabla de instructores
   instructores: {
     hoja: 'Instructores',
-    filEncabezado: 4,
+    filEncabezado: 5,
     colIniciales: 2,
     colEmail: 3,
     colNombreCal: 4,

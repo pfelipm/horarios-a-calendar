@@ -8,14 +8,33 @@
  */
 function onOpen() {
 
-  SpreadsheetApp.getUi().createMenu('🧑‍🏫 Horarios a Calendar')
-    .addItem('↗️ Generar clases en Calendar', 'm_CrearEventos')
+  SpreadsheetApp.getUi().createMenu('🗓️ Horarios a Calendar')
+    .addItem('➕ Generar clases en Calendar', 'm_CrearEventos')
+    .addItem('🟰 Actualizar clases en Calendar', 'm_ActualizarEventos')
+    .addItem('✖️ Eliminar clases en Calendar', 'm_EliminarEventos')
     .addSeparator()
-    .addItem('🗓️ Buscar calendarios instructores', 'm_ObtenerCalInstructores')
+    .addItem('🧑‍🏫 Buscar calendarios instructores', 'm_ObtenerCalInstructores')
     .addItem('🏫 Buscar salas', 'm_ObtenerSalas')
+    .addSeparator()
+    .addItem(`💡 Acerca de ${PARAM.nombreApp}`, 'acercaDe')
     .addToUi();
 
 }
+
+/**
+ * Muestra la ventana de información de la aplicación
+ */
+function acercaDe() {
+
+  let panel = HtmlService.createTemplateFromFile('acercaDe');
+  panel.nombre = PARAM.nombre;
+  panel.version = PARAM.version;
+  panel.urlRepoGitHub = PARAM.urlRepoGitHub;
+  SpreadsheetApp.getUi().showModalDialog(panel.evaluate().setWidth(420).setHeight(425), `${PARAM.icono} ${PARAM.nombre}`);
+
+}
+
+
 
 /**
  * Muestra un toast informativo con algunos valores por defecto.
@@ -113,7 +132,7 @@ function reducirHoja(hoja, reducir = { filas: true, columnas: false }) {
   const numMaxColumnas = hoja.getMaxColumns();
 
   if (reducir.filas && numMaxFilas > numFilas) hoja.deleteRows(numFilas + 1, numMaxFilas - numFilas);
-  if (reducir.columnas && numMaxColumnas > numColumnas ) hoja.deleteColumns(numColumnas + 1, numMaxColumnas - numColumnas);
+  if (reducir.columnas && numMaxColumnas > numColumnas) hoja.deleteColumns(numColumnas + 1, numMaxColumnas - numColumnas);
 
   return { filas: numMaxFilas - numFilas, columnas: numMaxColumnas - numColumnas };
 
@@ -127,22 +146,22 @@ function reducirHoja(hoja, reducir = { filas: true, columnas: false }) {
  */
 function botonCheckEventos() {
 
-conmutarChecks(
-  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.eventos.hoja),
-  PARAM.eventos.filEncabezado + 1,
-  PARAM.eventos.colCheck,
-  2);
-  
+  conmutarChecks(
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.eventos.hoja),
+    PARAM.eventos.filEncabezado + 1,
+    PARAM.eventos.colCheck,
+    2);
+
 }
 
 /**
- * Conmuta el estado un conjunto de casillas de verificación, devuelve el nº
- * de casillas de verificación que han sido actualizadas.
+ * Conmuta el estado un conjunto de casillas de verificación a partir de la fila indicada.
+ * Devuelve el nº de casillas han sido actualizadas.
  * 
  * @param   {SpreadsheetApp.Sheet}  hoja            Hoja en la que se encuentra el intervalo con casillas de verificación.
- * @param   {number}                filCheck        Nº de la fila en la que se encuentra la primera casillas de verificación.
+ * @param   {number}                filCheck        Nº de la fila en la que se encuentra la primera casilla de verificación.
  * @param   {number}                colCheck        Nº de la columna donde se encuentran las casillas de verificación.
- * @param   {number}                colDatos        Nº de la columna que se usa para determinar si hay datos en la fila.
+ * @param   {number}                colDatos        Nº de la columna que se usa para determinar si hay datos en cada fila.
  * @param   {numFilas}              numFilas        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()`.
  * @param   {string}                propiedadEstado Clave de las `ScriptProperties` en la que se guardará el estado actual de las casillas.
  * 
@@ -155,7 +174,7 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, pr
   // Uso el almacén del script porque puede administrarse desde el editor,
   // pero lo adecuado es emplear el del documento (⚠️ imprescindible en un complemento).
   const propiedadesDoc = PropertiesService.getScriptProperties();
-  const estado = JSON.parse(propiedadesDoc.getProperty(propiedadEstado)); 
+  const estado = JSON.parse(propiedadesDoc.getProperty(propiedadEstado));
   let numCheckActivos;
 
   if (colDatos > 1) {
@@ -163,19 +182,19 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, pr
     const rangoExisten = hoja.getRange(filCheck, colCheck + 1, numFilas);
     const existen = rangoExisten.getValues();
     numCheckActivos = existen.length - existen.reverse().findIndex(el => el[0] != '');
-  
+
   } else numCheckActivos = numFilas;
 
   if (numCheckActivos > 0) {
 
     if (estado) {
       hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(false);
-      propiedadesDoc.setProperty(propiedadEstado,false);
+      propiedadesDoc.setProperty(propiedadEstado, false);
     } else {
       hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(true);
       propiedadesDoc.setProperty(propiedadEstado, true)
     }
-  
+
   }
 
   return numCheckActivos;

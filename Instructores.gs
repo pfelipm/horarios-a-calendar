@@ -9,7 +9,7 @@
  */
 function m_ObtenerCalInstructores() {
 
-  if (alerta('Se sobreescribirán los calenarios existentes') == SpreadsheetApp.getUi().Button.OK) {
+  if (alerta('Se sobreescribirán los calendarios existentes') == SpreadsheetApp.getUi().Button.OK) {
 
     mostrarMensaje('Buscando calendarios de instructores...');
     

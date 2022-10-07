@@ -40,10 +40,9 @@ function m_ObtenerSalas() {
 
 }
 
-obtenerSalas()
-
 /**
- * Devuelve una lista de los recursos del dominio de tipo 'CONFERENCE_ROOM'.
+ * Devuelve una lista de los recursos del dominio de tipo `CONFERENCE_ROOM`.
+ * 
  * @return {Array<Admin_directory_v1.Admin.Directory_v1.Schema.CalendarResource>} Lista de salas
  */
 function obtenerSalas() {
