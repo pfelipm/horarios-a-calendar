@@ -26,27 +26,31 @@ const PARAM = {
 
   // Tabla de eventos
   eventos: {
-    hoja: 'Gestión eventos',
+    hoja: '➕ Gestión eventos',
     filEncabezado: 6,
     colCheck: 1,
     colGrupo: 2,
     colClase: 3,
     colDias: 4,
-    colHoraInico: 5,
+    colHoraInicio: 5,
     colHoraFin: 6,
-    colStartTime: 7,
-    colEndTime: 8,
+    colInstructor: 7,
+    colIdAula: 8,
     colDiaInicioRep: 9,
     colDiaFinRep: 10,
-    colDocente: 11,
-    colIdAula: 12,
-    colFechaProces: 13,
-    colIdSerieEvento: 14
+    colDescripcion: 11,
+    colStartTime: 12,
+    colEndTime: 13,
+    colFechaProceso: 14,
+    colResultado: 15,
+    checkInvitarInstructores: 'G2',
+    checkReservarEspacios: 'G3',
+    tag: '#HaC' // Utilizado para marcar los eventos creados, sin uso por ahora
   },
 
   // Tabla de instructores
   instructores: {
-    hoja: 'Instructores',
+    hoja: '🧑‍🏫 Instructores',
     filEncabezado: 5,
     colIniciales: 2,
     colEmail: 3,
@@ -58,11 +62,18 @@ const PARAM = {
 
   // Tabla de salas (aulas)
   salas: {
-    hoja: 'Salas',
+    hoja: '🏫 Salas',
     filEncabezado: 4,
     colNombre: 1,
     colIdCal: 5,
     colDatos: 1,
     ultEjecucion: 'E2'
+  },
+
+  // Tabla de registro de evcentos
+  archivo: {
+    hoja: '📦 Registro eventos',
+    filEncabezado: 2,
+    offsetCols: -1 // Desplazamiento índice columnas con respecto a tabla de gestión de eventos
   }
 };

@@ -26,15 +26,13 @@ function onOpen() {
  */
 function acercaDe() {
 
-  let panel = HtmlService.createTemplateFromFile('acercaDe');
+  let panel = HtmlService.createTemplateFromFile('Acerca de');
   panel.nombre = PARAM.nombre;
   panel.version = PARAM.version;
   panel.urlRepoGitHub = PARAM.urlRepoGitHub;
   SpreadsheetApp.getUi().showModalDialog(panel.evaluate().setWidth(420).setHeight(425), `${PARAM.icono} ${PARAM.nombre}`);
 
 }
-
-
 
 /**
  * Muestra un toast informativo con algunos valores por defecto.

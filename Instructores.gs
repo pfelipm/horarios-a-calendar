@@ -3,6 +3,7 @@
  ****************************************************/
 
 /**
+ * Función invocada desde el menú del script.
  * Escribe en la tabla de calendario de instructores los ID (emails)
  * de todos aquellos que comienzan por el prefijo indicado en la 
  * celda PARAM.instructores.prefijo.

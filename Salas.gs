@@ -3,8 +3,8 @@
  ******************************************************/
 
 /**
- * Función de menú, escribe en la hoja de cálculo la lista
- * de salas del dominio
+ * Función invocada desde el menú del script.
+ * escribe en la hoja de cálculo la lista de salas del dominio
  */
 function m_ObtenerSalas() {
 
