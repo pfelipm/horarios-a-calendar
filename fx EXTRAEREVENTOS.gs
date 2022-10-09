@@ -79,6 +79,14 @@ function EXTRAEREVENTOS(horario, agrupar = false, separador = '') {
 
   // Generar matriz resultado, se eliminan eventos surgidos a partir de celdas en blanco
 
-  return eventos.filter(evento => evento[0]);
+  eventos = eventos.filter(evento => evento[0] != '');
+  // Valor de retorno cuando no hay resultados (eventos) que devolver:
+  // ⭐ [1] undefined, null, no hacer return:
+  //        Evita #¡REF!, ESBLANCO(celda_resultado) → VERDADERO | =celda_resultado = "" → VERDADERO
+  //    [2] '', [''], [['']]:
+  //        Evita #¡REF!, ESBLANCO(celda_resultado) → FALSO, celda_resultado = "" → VERDADERO
+  //    [3] [], [[]]:
+  //        No evita #¡REF!, ESBLANCO(celda_resultado) → FALSO, celda_resultado = "" → VERDADERO
+  if (eventos.length > 0) return eventos;
 
 }

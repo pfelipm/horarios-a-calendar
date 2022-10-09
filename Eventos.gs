@@ -29,7 +29,7 @@ function m_CrearEventos() {
   // Leer datos necesarios para la geneneración de los eventos en Calendar.
   const instructores = leerDatosHoja(hdc.getSheetByName(PARAM.instructores.hoja), PARAM.instructores.filEncabezado + 1);
   const salas = leerDatosHoja(hdc.getSheetByName(PARAM.salas.hoja), PARAM.salas.filEncabezado + 1);
-  // Como hay casillas de verificación en la columna 1 es necesario descartar las filas en las que no hay eventos (sin clase)
+  // Como hay casillas de verificación en la columna 1 es necesario descartar las filas en las que no hay eventos (sin Clase)
   const eventos = leerDatosHoja(hojaEventos, PARAM.eventos.filEncabezado + 1)
     .filter(evento => evento[PARAM.eventos.colCheck - 1] == true && evento[PARAM.eventos.colClase -1] != '');
 
@@ -57,12 +57,26 @@ function m_CrearEventos() {
     
     // ¿Localizamos en la tabla de instructores las iniciales del asignado a esta clase?
     const instructor = instructores.find(instructor => instructor[PARAM.instructores.colIniciales - 1] == evento[PARAM.eventos.colInstructor - 1]);
-    if (!instructor) return [new Date(), '⭕ Instructor no existe'];
+    if (!instructor) {
+      saltados++;
+      return [new Date(), '⭕ Instructor no existe'];
+    }
 
     // Si es que sí, obtenemos su calendario público y su calendario privado (si hay que invitarle al evento de su clase)  
     const calendario = CalendarApp.getCalendarById(instructor[PARAM.instructores.colIdCal - 1]);
-    const guests = checkInvitarInstructores ? instructor[PARAM.instructores.colEmail - 1] : '';
+    let guests = checkInvitarInstructores ? instructor[PARAM.instructores.colEmail - 1] : '';
     
+    // const guests = instructores.find(instructor => instructor[0] == evento[2])[1] + ',' + salas.find(sala => sala[0] == evento[10])[1];
+
+    // ¿Deseamos reservar una sala?
+    if (checkReservarEspacios) {
+      const sala = salas.find(sala => sala[PARAM.salas.colNombre - 1] == evento[PARAM.eventos.colAula - 1]);
+      if (!sala) {
+      saltados++;
+      return [new Date(), '⭕ Aula no existe'];
+      } else guests = `${guests},${sala[PARAM.salas.colIdCal]}`;
+    }
+
     // ¿Tenemos todos los datos necesarios para generar el evento?
     if (title && endDate && startTime && endTime && guests && dias && calendario && !idPrevio) {
 
@@ -88,9 +102,9 @@ function m_CrearEventos() {
       }).getId(), new Date()];
 
     } else {
-      // Si no se ha creado un nuevo evento se mantienen el ID / fecha previos en columnas resultados
-      saltados++
-      return [idPrevio, evento[12]];
+      // Error genérico, faltan datos necesarios en la tabla (fila del evento)
+      saltados++;
+      return [new Date(), '⭕ Instructor no existe'];y
     }
   });
 

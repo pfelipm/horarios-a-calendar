@@ -16,7 +16,7 @@ function onOpen() {
     .addItem('🧑‍🏫 Buscar calendarios instructores', 'm_ObtenerCalInstructores')
     .addItem('🏫 Buscar salas', 'm_ObtenerSalas')
     .addSeparator()
-    .addItem(`💡 Acerca de ${PARAM.nombreApp}`, 'acercaDe')
+    .addItem(`💡 Acerca de ${PARAM.nombre}`, 'acercaDe')
     .addToUi();
 
 }
@@ -41,7 +41,7 @@ function acercaDe() {
  * @param {number}  [tiempoSeg]
  * @param {string}  [titulo]
  */
-function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = PARAM.nombreAp) {
+function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = PARAM.nombre) {
 
   SpreadsheetApp.getActive().toast(mensaje, titulo, tiempoSeg);
 
@@ -58,7 +58,7 @@ function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = PARAM.nombreAp) {
  * 
  * @return  {Button}    Botón sobre el que se ha hecho clic    
  */
-function alerta(mensaje, botones = SpreadsheetApp.getUi().ButtonSet.OK_CANCEL, titulo = PARAM.nombreApp) {
+function alerta(mensaje, botones = SpreadsheetApp.getUi().ButtonSet.OK_CANCEL, titulo = PARAM.nombre) {
 
   return SpreadsheetApp.getUi().alert(titulo, mensaje, botones);
 
@@ -148,7 +148,7 @@ function botonCheckEventos() {
     SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.eventos.hoja),
     PARAM.eventos.filEncabezado + 1,
     PARAM.eventos.colCheck,
-    2);
+    2); // 2 == Columna "Grupo"
 
 }
 
@@ -156,14 +156,14 @@ function botonCheckEventos() {
  * Conmuta el estado un conjunto de casillas de verificación a partir de la fila indicada.
  * Devuelve el nº de casillas han sido actualizadas.
  * 
- * @param   {SpreadsheetApp.Sheet}  hoja            Hoja en la que se encuentra el intervalo con casillas de verificación.
- * @param   {number}                filCheck        Nº de la fila en la que se encuentra la primera casilla de verificación.
- * @param   {number}                colCheck        Nº de la columna donde se encuentran las casillas de verificación.
- * @param   {number}                colDatos        Nº de la columna que se usa para determinar si hay datos en cada fila.
- * @param   {numFilas}              numFilas        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()`.
- * @param   {string}                propiedadEstado Clave de las `ScriptProperties` en la que se guardará el estado actual de las casillas.
+ * @param   {SpreadsheetApp.Sheet}  hoja              Hoja en la que se encuentra el intervalo con casillas de verificación.
+ * @param   {number}                filCheck          Nº de la fila en la que se encuentra la primera casilla de verificación.
+ * @param   {number}                colCheck          Nº de la columna donde se encuentran las casillas de verificación.
+ * @param   {number}                [colDatos]        Nº de la columna que se usa para determinar si hay datos en cada fila.
+ * @param   {numFilas}              [numFilas]        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()`.
+ * @param   {string}                [propiedadEstado] Clave de las `ScriptProperties` en la que se guardará el estado actual de las casillas.
  * 
- * @return  {number}                                Número de casillas de verificación actualizadas.
+ * @return  {number}                                  Número de casillas de verificación actualizadas.
  */
 function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, propiedadEstado = 'estadoCheck01') {
 
@@ -177,9 +177,10 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, pr
 
   if (colDatos > 1) {
 
-    const rangoExisten = hoja.getRange(filCheck, colCheck + 1, numFilas);
-    const existen = rangoExisten.getValues();
-    numCheckActivos = existen.length - existen.reverse().findIndex(el => el[0] != '');
+    const existen = hoja.getRange(filCheck, colDatos, numFilas).getValues();
+    const indiceUltimoValor = existen.reverse().findIndex(el => el[0] != '');
+    if (indiceUltimoValor == -1) numCheckActivos = 0;
+    else numCheckActivos = existen.length - indiceUltimoValor;
 
   } else numCheckActivos = numFilas;
 
