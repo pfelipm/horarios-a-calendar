@@ -12,12 +12,6 @@
 /**
  * Constantes generales de parametrización del script
  */
-
-const T_EVENTOS = 'A3:M11';
-const T_RES = 'L3:M11';
-const T_CAL_PROF = 'O3:Q11';
-const T_CAL_AULA = 'S3:T11';
-
 const PARAM = {
   nombre: 'HaC',
   version: 'Versión 1.0 (octubre 2022)',
@@ -41,8 +35,8 @@ const PARAM = {
     colDescripcion: 11,
     colStartTime: 12,
     colEndTime: 13,
-    colFechaProceso: 14,  // No usado
-    colResultado: 15, // No usado
+    colFechaProceso: 14,
+    colResultado: 15,
     checkInvitarInstructores: 'G2',
     checkReservarEspacios: 'G3',
     tag: '#HaC' // Utilizado para marcar los eventos creados, sin uso

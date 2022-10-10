@@ -38,8 +38,8 @@ function acercaDe() {
  * Muestra un toast informativo con algunos valores por defecto.
  * 
  * @param {string}  mensaje
- * @param {number}  [tiempoSeg]
- * @param {string}  [titulo]
+ * @param {number}  [tiempoSeg] Segundos en pantalla [hasta clic].
+ * @param {string}  [titulo]    Título del toast [`PARAM.nombre`].
  */
 function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = PARAM.nombre) {
 
@@ -53,8 +53,8 @@ function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = PARAM.nombre) {
  * como una [enumeración `Ui.Button`](https://developers.google.com/apps-script/reference/base/button).
  * 
  * @param   {string}    mensaje
- * @param   {ButtonSet} [botones] [Enumeración `Ui.ButtonSet`](https://developers.google.com/apps-script/reference/base/button-set).
- * @param   {string}    [titulo]
+ * @param   {ButtonSet} [botones] [Enumeración `Ui.ButtonSet`](https://developers.google.com/apps-script/reference/base/button-set) [ButtonSet.OK_CANCEL].
+ * @param   {string}    [titulo]  Título de la alerta [`PARAM.nombre`].
  * 
  * @return  {Button}    Botón sobre el que se ha hecho clic    
  */
@@ -69,8 +69,8 @@ function alerta(mensaje, botones = SpreadsheetApp.getUi().ButtonSet.OK_CANCEL, t
  * que se encuentran a partir de una fila y columnas iniciales dadas (se asumen 1 si se omiten).
  * 
  * @param   {SpreadsheetApp.Sheet}  hoja   
- * @param   {number}                [numFila]     Nº de fila, comenzando por 1 (se asume 1 si no se facilita).
- * @param   {number}                [numColumna]  Nº de columna, comenzando por 1 (se asume 1 si no se facilita).
+ * @param   {number}                [numFila]     Nº de fila, comenzando por 1 [1].
+ * @param   {number}                [numColumna]  Nº de columna, comenzando por 1 [1].
  * 
  * @return  {Array}                 Valores de las celdas de la tabla
  */
@@ -89,10 +89,10 @@ function leerDatosHoja(hoja, numFila = 1, numColumna = 1) {
  * 
  * @param {SpreadsheetApp.Sheet}  hoja
  * @param {Array}                 matriz            Pasar un valor `undefined` si solo se desea borrar la hoja.
- * @param {number}                [numFila]         Nº de fila, comenzado por 1 (se asume 1 si no se facilita).
- * @param {number}                [numColumna]      Nº de columna, comenzado por 1 (se asume 1 si no se facilita).
- * @param {boolean}               [borrarDatos]     VERDADERO si se desean borrar los valores.
- * @param {boolean}               [borrarFormato]   VERDADERO si se desean borrar formato y reglas de validación.
+ * @param {number}                [numFila]         Nº de fila, comenzado por 1 [1].
+ * @param {number}                [numColumna]      Nº de columna, comenzado por 1 [1].
+ * @param {boolean}               [borrarDatos]     VERDADERO si se desean borrar los valores [`true`].
+ * @param {boolean}               [borrarFormato]   VERDADERO si se desean borrar formato y reglas de validación [`false`].
  */
 function actualizarDatosTabla(hoja, matriz, numFila = 1, numColumna = 1, borrarDatos = true, borrarFormato = false) {
 
@@ -114,11 +114,11 @@ function actualizarDatosTabla(hoja, matriz, numFila = 1, numColumna = 1, borrarD
  * un objeto como `{ filas: number, columnas: number }`.
  * 
  * @param   {SpreadsheetApp.Sheet}        hoja                  Hoja a reducir.
- * @param   {Object}                      [reducir]             Elementos a eliminar como `{ filas: boolean, columnas: boolean }`.
+ * @param   {Object}                      [reducir]             Elementos a eliminar [`{ filas: true, columnas: false }`].
  * @param   {Boolean}                     reducir.filas
  * @param   {Boolean}                     reducir.columnas
  *
- * @return  {Object} eliminadas          Nº de F/C eliminadas
+ * @return  {Object} eliminadas           Nº de F/C eliminadas
  * @return  {number} eliminadas.filas
  * @return  {number} eliminadas.columnas
  */
@@ -153,15 +153,15 @@ function botonCheckEventos() {
 }
 
 /**
- * Conmuta el estado un conjunto de casillas de verificación a partir de la fila indicada.
+ * Conmuta el estado un conjunto de casillas de verificación a partir de la fila indicada de una tabla (hoja).
  * Devuelve el nº de casillas han sido actualizadas.
  * 
  * @param   {SpreadsheetApp.Sheet}  hoja              Hoja en la que se encuentra el intervalo con casillas de verificación.
  * @param   {number}                filCheck          Nº de la fila en la que se encuentra la primera casilla de verificación.
  * @param   {number}                colCheck          Nº de la columna donde se encuentran las casillas de verificación.
- * @param   {number}                [colDatos]        Nº de la columna que se usa para determinar si hay datos en cada fila.
- * @param   {numFilas}              [numFilas]        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()`.
- * @param   {string}                [propiedadEstado] Clave de las `ScriptProperties` en la que se guardará el estado actual de las casillas.
+ * @param   {number}                [colDatos]        Nº de la columna que se usa para determinar si hay datos en cada fila [1].
+ * @param   {numFilas}              [numFilas]        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()` [0].
+ * @param   {string}                [propiedadEstado] Clave de las `ScriptProperties` que guardará el estado actual de las casillas [`'estadoCheck01'`].
  * 
  * @return  {number}                                  Número de casillas de verificación actualizadas.
  */
