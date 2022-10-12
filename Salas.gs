@@ -9,11 +9,10 @@
 function m_ObtenerSalas() {
 
   if (alerta('Se sobreescribirán las salas existentes') == SpreadsheetApp.getUi().Button.OK) {
-
     
     mostrarMensaje('Buscando salas en el dominio...');
 
-    hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.salas.hoja).activate();
+    hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.salas.hoja).activate();
     const salas = obtenerSalas().map(recurso =>
       [
         recurso.resourceName,

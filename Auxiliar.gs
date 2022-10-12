@@ -9,8 +9,7 @@
 function onOpen() {
 
   SpreadsheetApp.getUi().createMenu('🗓️ Horarios a Calendar')
-    .addItem('➕ Generar clases en Calendar', 'm_CrearEventos')
-    .addItem('🟰 Actualizar clases en Calendar', 'm_ActualizarEventos')
+    .addItem('➕ Generar/actualizar clases en Calendar', 'm_CrearEventos')
     .addItem('✖️ Eliminar clases en Calendar', 'm_EliminarEventos')
     .addSeparator()
     .addItem('🧑‍🏫 Buscar calendarios instructores', 'm_ObtenerCalInstructores')
@@ -39,9 +38,9 @@ function acercaDe() {
  * 
  * @param {string}  mensaje
  * @param {number}  [tiempoSeg] Segundos en pantalla [hasta clic].
- * @param {string}  [titulo]    Título del toast [`PARAM.nombre`].
+ * @param {string}  [titulo]    Título del toast [`PARAM.icono` `PARAM.nombre`].
  */
-function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = PARAM.nombre) {
+function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = `${PARAM.icono} ${PARAM.nombre}`) {
 
   SpreadsheetApp.getActive().toast(mensaje, titulo, tiempoSeg);
 
@@ -54,11 +53,11 @@ function mostrarMensaje(mensaje, tiempoSeg = -1, titulo = PARAM.nombre) {
  * 
  * @param   {string}    mensaje
  * @param   {ButtonSet} [botones] [Enumeración `Ui.ButtonSet`](https://developers.google.com/apps-script/reference/base/button-set) [ButtonSet.OK_CANCEL].
- * @param   {string}    [titulo]  Título de la alerta [`PARAM.nombre`].
+ * @param   {string}    [titulo]  Título de la alerta [`PARAM.icono` `PARAM.nombre`].
  * 
  * @return  {Button}    Botón sobre el que se ha hecho clic    
  */
-function alerta(mensaje, botones = SpreadsheetApp.getUi().ButtonSet.OK_CANCEL, titulo = PARAM.nombre) {
+function alerta(mensaje, botones = SpreadsheetApp.getUi().ButtonSet.OK_CANCEL, titulo = `${PARAM.icono} ${PARAM.nombre}`) {
 
   return SpreadsheetApp.getUi().alert(titulo, mensaje, botones);
 
@@ -72,7 +71,7 @@ function alerta(mensaje, botones = SpreadsheetApp.getUi().ButtonSet.OK_CANCEL, t
  * @param   {number}                [numFila]     Nº de fila, comenzando por 1 [1].
  * @param   {number}                [numColumna]  Nº de columna, comenzando por 1 [1].
  * 
- * @return  {Array}                 Valores de las celdas de la tabla
+ * @return  {Array} Valores de las celdas de la tabla
  */
 function leerDatosHoja(hoja, numFila = 1, numColumna = 1) {
 
@@ -84,11 +83,11 @@ function leerDatosHoja(hoja, numFila = 1, numColumna = 1) {
  * Escribe los valores de una matriz en las celdas de una hoja a partir de una fila y columnas dadas
  * (se asumen 1 si se omiten), borrando previamente de manera opcional los valores y/o formato existentes
  * en la hoja. Si no se establecen los parámetros opcionales `borrarDatos` y `borrarFormato` se borrarán
- * únicamente los valores previos. Si la matriz de datos a escribir es 'undefined' solo se efectuará el
- * borrado de datos.
+ * únicamente los valores previos. Si la matriz de datos a escribir es `null`o 'undefined' solo se efectuará
+ * el borrado de datos.
  * 
  * @param {SpreadsheetApp.Sheet}  hoja
- * @param {Array}                 matriz            Pasar un valor `undefined` si solo se desea borrar la hoja.
+ * @param {Array}                 matriz            Pasar un valor `null' o `undefined` si solo se desea borrar la hoja.
  * @param {number}                [numFila]         Nº de fila, comenzado por 1 [1].
  * @param {number}                [numColumna]      Nº de columna, comenzado por 1 [1].
  * @param {boolean}               [borrarDatos]     VERDADERO si se desean borrar los valores [`true`].
@@ -145,7 +144,7 @@ function reducirHoja(hoja, reducir = { filas: true, columnas: false }) {
 function botonCheckEventos() {
 
   conmutarChecks(
-    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.eventos.hoja),
+    SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja),
     PARAM.eventos.filEncabezado + 1,
     PARAM.eventos.colCheck,
     2); // 2 == Columna "Grupo"
@@ -163,7 +162,7 @@ function botonCheckEventos() {
  * @param   {numFilas}              [numFilas]        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()` [0].
  * @param   {string}                [propiedadEstado] Clave de las `ScriptProperties` que guardará el estado actual de las casillas [`'estadoCheck01'`].
  * 
- * @return  {number}                                  Número de casillas de verificación actualizadas.
+ * @return  {number} Número de casillas de verificación actualizadas.
  */
 function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, propiedadEstado = 'estadoCheck01') {
 
@@ -197,5 +196,67 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, pr
   }
 
   return numCheckActivos;
+
+}
+
+/**
+ * Busca cada ocurrencia del evento caracterizado por grupo y clase
+ * en la tabla de la hoja de registro de eventos `PARAM.registro.hoja` y
+ * si existen:
+ * 
+ *  1. Elimina el evento de calendario asociado
+ *  2. Elimina la fila de la tabla en la que se ha hallado.
+ * 
+ * (!) Si la tabla no ha sido manipulada y no se han producido errores, solo debería
+ * darse una única coincidencia, no obstante se comprueban múltiples.
+ * 
+ * @param   {string}  grupo Código de grupo de la clase.
+ * @param   {string}  clase Código de la clase.
+ * 
+ * @return  {number}  Número de filas / eventos eliminados
+ */
+function eliminarEventosPreviosRegistro(grupo, clase) {
+
+  const hojaRegistro = SpreadsheetApp.getActive().getSheetByName(PARAM.registro.hoja);
+
+  const eventosEliminar = leerDatosHoja(hojaRegistro, PARAM.registro.filEncabezado + 1)
+    .reduce((listaEventos, evento, indice) => {
+
+      if (evento[PARAM.registro.colGrupo - 1] == grupo && evento[PARAM.registro.colClase - 1] == clase) {
+        return [...listaEventos,
+          {
+            fila: PARAM.registro.filEncabezado + indice + 1,
+            idEvento: evento[PARAM.registro.colIdEv - 1],
+            idCalendario: evento[PARAM.registro.colIdCal - 1]
+          }];
+      } else return listaEventos;
+
+    },[]);
+    
+  //console.info(eventosEliminar);
+
+  let eventosEliminados = 0;
+  if (eventosEliminar.length > 0) {
+
+    // Se comienza desde el final de la hoja para que los números de filas sigan siendo válidos tras cada eliminación
+    eventosEliminar.reverse().forEach(evento => {
+
+      try {
+
+        // CalendarApp.getCalendarById(evento.idCalendario).getEventSeriesById(evento.idEvento).deleteEventSeries();
+        hojaRegistro.deleteRow(evento.fila);
+        eventosEliminados++;
+
+      } catch(e) {
+
+        // Sin tratamiento, simplemente se registra el error
+        console.info('Excepción: ' + evento + '\n' + e.message);
+
+      }
+    
+    });
+  }
+
+  return eventosEliminados;
 
 }

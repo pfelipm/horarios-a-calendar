@@ -39,6 +39,8 @@ const PARAM = {
     colResultado: 15,
     checkInvitarInstructores: 'G2',
     checkReservarEspacios: 'G3',
+    checkDesmarcarProcesados: 'J2',
+    checkBorrarPrevios: 'J3',
     tag: '#HaC' // Utilizado para marcar los eventos creados, sin uso
   },
 
@@ -63,10 +65,13 @@ const PARAM = {
     ultEjecucion: 'E2'
   },
 
-  // Tabla de registro de evcentos
-  archivo: {
+  // Tabla de registro de eventos
+  registro: {
     hoja: '📦 Registro eventos',
     filEncabezado: 2,
-    offsetCols: -1 // Desplazamiento índice columnas con respecto a tabla de gestión de eventos
+    colGrupo: 1,
+    colClase: 2,
+    colIdEv: 11,
+    colIdCal: 12
   }
 };

@@ -14,7 +14,7 @@ function m_ObtenerCalInstructores() {
 
     mostrarMensaje('Buscando calendarios de instructores...');
     
-    hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PARAM.instructores.hoja).activate();
+    hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
     const prefijo = hoja.getRange(PARAM.instructores.prefijo).getValue();
 
     const calendarios = CalendarApp.getAllCalendars().reduce((lista, calendario) => {
