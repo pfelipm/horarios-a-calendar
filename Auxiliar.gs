@@ -243,6 +243,8 @@ function eliminarEventosPreviosRegistro(grupo, clase) {
 
       try {
 
+        // Refinar esto: si existe fila siempre debe borrarse, aunque el evento ya no exista en Calendar
+        // diferenciar ambos posibles resultados para mostrar un mensaje de resultado significativo
         // CalendarApp.getCalendarById(evento.idCalendario).getEventSeriesById(evento.idEvento).deleteEventSeries();
         hojaRegistro.deleteRow(evento.fila);
         eventosEliminados++;
