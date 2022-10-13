@@ -10,13 +10,15 @@
  */
 function m_ObtenerCalInstructores() {
 
+  const hojaActual = SpreadsheetApp.getActiveSheet();
+  hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
+  SpreadsheetApp.flush();
+
   if (alerta('Se sobreescribirán los calendarios existentes') == SpreadsheetApp.getUi().Button.OK) {
 
     mostrarMensaje('Buscando calendarios de instructores...');
     
-    hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
     const prefijo = hoja.getRange(PARAM.instructores.prefijo).getValue();
-
     const calendarios = CalendarApp.getAllCalendars().reduce((lista, calendario) => {
       if (calendario.getName().startsWith(prefijo)) return [...lista, [calendario.getName(), calendario.getId()]];
       else return lista;
@@ -39,6 +41,6 @@ function m_ObtenerCalInstructores() {
         
     } else mostrarMensaje('No se han encontrado calendarios.',5);
   
-  }
+  } else hojaActual.activate();
 
 }

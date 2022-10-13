@@ -8,11 +8,14 @@
  */
 function m_ObtenerSalas() {
 
+  const hojaActual = SpreadsheetApp.getActiveSheet();
+  hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.salas.hoja).activate();
+  SpreadsheetApp.flush();
+
   if (alerta('Se sobreescribirán las salas existentes') == SpreadsheetApp.getUi().Button.OK) {
     
     mostrarMensaje('Buscando salas en el dominio...');
 
-    hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.salas.hoja).activate();
     const salas = obtenerSalas().map(recurso =>
       [
         recurso.resourceName,
@@ -35,7 +38,7 @@ function m_ObtenerSalas() {
 
     } else mostrarMensaje('No se han encontrado salas.',5);
 
-  }
+  } else hojaActual.activate();
 
 }
 

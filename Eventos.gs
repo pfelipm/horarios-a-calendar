@@ -5,62 +5,6 @@
 
 /**
  * Función invocada desde el menú del script.
- * Consulta la existencia de los eventos seleccionados en la tabla de registro de la hoja
- * `PARAM.registro.hoja` e intenta eliminarlos, tanto de la hoja de registro como de los
- * calendarios en los que se tiene constancia de que han sido creados previamente.
- */
-function m_EliminarEventos() {
-
-  if (alerta('Se eliminarán los eventos asociados a las clases seleccionadas') == SpreadsheetApp.getUi().Button.OK) {
-  
-    const hojaEventos = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja);
-    const checkDesmarcar = hojaEventos.getRange(PARAM.eventos.checkDesmarcarProcesados).getValue();
-    const checkBorrarPrevios = hojaEventos.getRange(PARAM.eventos.checkBorrarPrevios).getValue();
-    let eliminados = 0;
-    let noHallados = 0;
-
-    mostrarMensaje('Eliminando clases...');
-
-    // Obtener las clases seleccionadas de la tabla cuyos eventos deben tratarse de eliminar,
-    // se descartan las clases en las filas en las que falta grupo o clase.
-    const eventosFilas = leerDatosHoja(hojaEventos, PARAM.eventos.filEncabezado + 1)
-      .map((evento, indice) => { return { ajustes: evento, fila: indice + 1 } })
-      .filter(eventoFila => eventoFila.ajustes[PARAM.eventos.colCheck - 1] == true
-        && eventoFila.ajustes[PARAM.eventos.colGrupo - 1] != ''
-        && eventoFila.ajustes[PARAM.eventos.colClase - 1] != '');
-
-    if (checkBorrarPrevios) actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso + 1);
-
-    eventosFilas.forEach(eventoFila => {
-
-      // Fila con información de cada evento leída de la hoja de eventos
-      const evento = eventoFila.ajustes;
-
-      const instanciasEliminadas = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1]);
-            
-      // Actualizar tabla (columnas Fecha proceso y Resultado)
-      hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colFechaProceso, 1, 2)
-        .setValues([[new Date(), instanciasEliminadas > 0 ? '✖️ Evento eliminado' : '⭕ Evento no encontrado']]);
-
-      // Desmarcar selección, si se ha seleccionado esa opción...
-      if (instanciasEliminadas > 0) {
-        eliminados++;
-        if (checkDesmarcar) hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colCheck, 1, 1).setValue(false);
-      } else noHallados++;
-
-      SpreadsheetApp.flush();
-
-    });
-
-    // Resumen del resultado de la operación
-    mostrarMensaje('Proceso terminado.', 2);
-    alerta('✖️ Eliminados: ' + eliminados + '\n⭕ No encontrados: ' + noHallados, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
-    
-  }
-}
-
-/**
- * Función invocada desde el menú del script.
  * Inserta eventos recurrentes en los calendarios públicos de los instructores.
  * Opcionalmente: a) Reserva salas b) Envía invitaciones a los instructores asignadas a cada sesión.
  * Guarda la información de cada evento creado en la tabla `📦 Registro eventos`. Antes de crear uno
@@ -73,8 +17,12 @@ function m_EliminarEventos() {
  * los eventos generados y tener que hacer una búsqueda por fuerza bruta en todos los calendarios de instructores.
  */
 function m_CrearEventos() {
+  
+  const hojaActual = SpreadsheetApp.getActiveSheet();
+  hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
+  SpreadsheetApp.flush();
 
-  if (alerta('Se crearán o actualizarán eventos para las clases seleccionadas') == SpreadsheetApp.getUi().Button.OK) {
+  if (alerta('Se crearán o actualizarán eventos para las clases seleccionadas.') == SpreadsheetApp.getUi().Button.OK) {
 
     const hdc = SpreadsheetApp.getActive();
     const hojaEventos = hdc.getSheetByName(PARAM.eventos.hoja);
@@ -262,6 +210,67 @@ function m_CrearEventos() {
     mostrarMensaje('Proceso terminado.', 2);
     alerta('🟢 Creados: ' + creados + '\n🟠 Omitidos: ' + omitidos,  SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
   
-  }
+  } else hojaActual.activate();
 
+}
+
+/**
+ * Función invocada desde el menú del script.
+ * Consulta la existencia de los eventos seleccionados en la tabla de registro de la hoja
+ * `PARAM.registro.hoja` e intenta eliminarlos, tanto de la hoja de registro como de los
+ * calendarios en los que se tiene constancia de que han sido creados previamente.
+ */
+function m_EliminarEventos() {
+
+  const hojaActual = SpreadsheetApp.getActiveSheet();
+  hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
+  SpreadsheetApp.flush();
+
+  if (alerta('Se eliminarán los eventos asociados a las clases seleccionadas.') == SpreadsheetApp.getUi().Button.OK) {
+
+    mostrarMensaje('Eliminando clases...');
+
+    const hojaEventos = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja);
+    const checkDesmarcar = hojaEventos.getRange(PARAM.eventos.checkDesmarcarProcesados).getValue();
+    const checkBorrarPrevios = hojaEventos.getRange(PARAM.eventos.checkBorrarPrevios).getValue();
+    let eliminados = 0;
+    let noHallados = 0;
+
+    // Obtener las clases seleccionadas de la tabla cuyos eventos deben tratarse de eliminar,
+    // se descartan las clases en las filas en las que falta grupo o clase.
+    const eventosFilas = leerDatosHoja(hojaEventos, PARAM.eventos.filEncabezado + 1)
+      .map((evento, indice) => { return { ajustes: evento, fila: indice + 1 } })
+      .filter(eventoFila => eventoFila.ajustes[PARAM.eventos.colCheck - 1] == true
+        && eventoFila.ajustes[PARAM.eventos.colGrupo - 1] != ''
+        && eventoFila.ajustes[PARAM.eventos.colClase - 1] != '');
+
+    if (checkBorrarPrevios) actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso + 1);
+
+    eventosFilas.forEach(eventoFila => {
+
+      // Fila con información de cada evento leída de la hoja de eventos
+      const evento = eventoFila.ajustes;
+
+      const instanciasEliminadas = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1]);
+            
+      // Actualizar tabla (columnas Fecha proceso y Resultado)
+      hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colFechaProceso, 1, 2)
+        .setValues([[new Date(), instanciasEliminadas > 0 ? '✖️ Evento eliminado' : '⭕ Evento no encontrado']]);
+
+      // Desmarcar selección, si se ha seleccionado esa opción...
+      if (instanciasEliminadas > 0) {
+        eliminados++;
+        if (checkDesmarcar) hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colCheck, 1, 1).setValue(false);
+      } else noHallados++;
+
+      SpreadsheetApp.flush();
+
+    });
+
+    // Resumen del resultado de la operación
+    mostrarMensaje('Proceso terminado.', 2);
+    alerta('✖️ Eliminados: ' + eliminados + '\n⭕ No encontrados: ' + noHallados, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
+    
+  } else hojaActual.activate();
+  
 }
