@@ -79,10 +79,10 @@ function m_CrearEventos() {
         // Posible solución:
         //   - Leer valor de fecha normalmente con getValue() y de hora con getDisplayValue()
         //   - Combinar haciendo eventStart = new Date(fecha.setHours(fechaComoTexto.split(':')[0], fechaComoTexto.split(':')[1]))
-        // Paso de movidas y "monto" fecha + hora mediante fórmulas en la hoja de cálculo, eso me evita leer la tabla de dos modos distintos
-
+        // Paso de movidas y "monto" fecha + hora mediante fórmulas en la hoja de cálculo, eso me evita leer la tabla de dos modos distintos.
         const startTime = evento[PARAM.eventos.colStartTime - 1];
         const endTime = evento[PARAM.eventos.colEndTime - 1];
+        
         // ⚠️ Si cadena vacía, split() devuelve un array que contiene una cadena vacía (en lugar de un array vacío)
         const dias = evento[PARAM.eventos.colDias - 1].split('-');
         const descripcion = evento[PARAM.eventos.colDescripcion - 1];
@@ -117,7 +117,10 @@ function m_CrearEventos() {
 
           // Aquí toca comprobar si esa sesión (GRUPO, CLASE) ya se ha generado POR HACER
 
-          // No es necesario que el día de la semana de startTime coincida con el 1º en la serie según la recurrencia, Calendar ajusta internamente 👏
+          // ⚠️ Es necesario que el día de la semana de startTime coincida con el 1º en la serie según la recurrencia, de  lo contrario
+          // se genera una repetación fantasma en el día indicado, aunque no forme parte de los establecidos para la repetición. Esto
+          // no ocurre cuando se crean eventos periódicos manualmente desde Calendar.
+          // 👍 Con endDate no hay problema, las repeticiones finalizan cuando corresponde.
           const recurrence = CalendarApp.newRecurrence()
             .addWeeklyRule()
             .onlyOnWeekdays(dias.map(dia => {
