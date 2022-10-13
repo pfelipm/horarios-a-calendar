@@ -13,6 +13,9 @@
  *
  * @customfunction
  *
+ * Artículo:    https://pablofelip.online/desacoplar-acoplar/
+ * Repositorio: https://github.com/pfelipm/fxdesacoplar-acoplar
+ * 
  * MIT License
  * Copyright (c) 2020 Pablo Felip Monferrer(@pfelipm)
  */ 

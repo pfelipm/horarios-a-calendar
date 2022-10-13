@@ -104,7 +104,7 @@ function m_CrearEventos() {
         if (checkReservarEspacios) {
           const sala = salas.find(sala => sala[PARAM.salas.colNombre - 1] == evento[PARAM.eventos.colAula - 1]);
           if (!sala) throw '⭕ Aula no existe';
-          else guests = `${guests},${sala[PARAM.salas.colIdCal]}`;
+          else guests = `${guests},${sala[PARAM.salas.colIdCal - 1]}`;
         }
 
         // ¿Tenemos todos los datos necesarios para generar el evento?
@@ -132,19 +132,12 @@ function m_CrearEventos() {
           })).until(endDate);
 
         // Los eventos de clases se crearán en el calendario público del instructor,
-        // en su caso invitando a la sala y al propio instructor (mejora: múltiples salas).
-
-        resultado = {
-          idEvento: 'ID_FALSO',
-          idCalendario: idCalendario,
-          selloTiempo: new Date(),
-          mensaje: '🟢 Evento simulado creado',
-          fila: eventoFila.fila };
+        // en su caso invitando a la sala y al propio instructor (mejora: permitir reserva de múltiples salas por evento).
 
         // Eliminar posibles eventos ya creados previamente para este grupo y clase, no se usa el valor devuelto (nº eliminados)
         eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1]);
         
-        /*
+        // ...y ahora generamos los nuevos
         const eventoCalendar = calendario.createEventSeries(title, startTime, endTime, recurrence,
           {
             description: descripcion,
@@ -153,13 +146,12 @@ function m_CrearEventos() {
           });
         eventoCalendar.setTag(tag, tag); // Por ahora no se usa para nada
         resultado = {
-          id: eventoCalendar.getId(),
+          idEvento: eventoCalendar.getId(),
           idCalendario: idCalendario,
           selloTiempo: new Date(),
           mensaje: '🟢 Evento creado',
-          fila: eventoFila.fila };
-        }
-        */
+          fila: eventoFila.fila
+        };
         creados++;
 
       } catch (e) {
