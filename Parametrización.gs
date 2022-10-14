@@ -26,11 +26,11 @@ const PARAM = {
     colGrupo: 2,
     colClase: 3,
     colDias: 4,
-    colHoraInicio: 5, // No usado
-    colHoraFin: 6, // No usado
+    colHoraInicio: 5,
+    colHoraFin: 6,
     colInstructor: 7,
     colAula: 8,
-    colDiaInicioRep: 9, // No usado
+    colDiaInicioRep: 9,
     colDiaFinRep: 10,
     colDescripcion: 11,
     colStartTime: 12,
@@ -41,7 +41,7 @@ const PARAM = {
     checkReservarEspacios: 'G3',
     checkDesmarcarProcesados: 'J2',
     checkBorrarPrevios: 'J3',
-    tag: '#HaC' // Utilizado para marcar los eventos creados, sin uso
+    tag: '#HaC' // Utilizado para marcar los eventos creados, sin uso efectivo
   },
 
   // Tabla de instructores
