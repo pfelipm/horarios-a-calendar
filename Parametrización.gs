@@ -17,10 +17,12 @@ const PARAM = {
   version: 'Versión 1.0 (octubre 2022)',
   icono: '🗓️',
   urlRepoGitHub: 'https://github.com/pfelipm/horarios-a-calendar',
+  propiedadEstadoCheck: 'estadoCheck01',
 
   // Tabla de eventos
   eventos: {
     hoja: '➕ Gestión eventos',
+    separadorDias: ',',
     filEncabezado: 6,
     colCheck: 1,
     colGrupo: 2,
@@ -35,8 +37,9 @@ const PARAM = {
     colDescripcion: 11,
     colStartTime: 12,
     colEndTime: 13,
-    colFechaProceso: 14,
-    colResultado: 15,
+    colEndDateTime: 14,
+    colFechaProceso: 15,
+    colResultado: 16,
     checkInvitarInstructores: 'G2',
     checkReservarEspacios: 'G3',
     checkDesmarcarProcesados: 'J2',

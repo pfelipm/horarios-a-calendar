@@ -71,7 +71,7 @@ function m_CrearEventos() {
 
         // Título del evento: Grupo + Clase + (iniciales instructor)
         const title = `${evento[PARAM.eventos.colGrupo - 1]} ${evento[PARAM.eventos.colClase - 1]} (${evento[PARAM.eventos.colInstructor - 1]})`;
-        const endDate = evento[PARAM.eventos.colDiaFinRep - 1];
+        const endDate = evento[PARAM.eventos.colDiaFinRep - 1]; // No usado, en su lugar utilizaremos endDateTime
 
         // ⚠️ Marcianada al leer celdas con datos de hora sin fecha:
         // Ej, celda: 17:00:00 (formateada como hora) >> Objeto Date:Sat Dec 30 1899 17:24:05 GMT+0009 (Central European Standard Time) 😵‍💫
@@ -82,9 +82,15 @@ function m_CrearEventos() {
         // Paso de movidas y "monto" fecha + hora mediante fórmulas en la hoja de cálculo, eso me evita leer la tabla de dos modos distintos.
         const startTime = evento[PARAM.eventos.colStartTime - 1];
         const endTime = evento[PARAM.eventos.colEndTime - 1];
+
+        // Además, pasa esta marcianda https://issuetracker.google.com/issues/236615807
+        // ...siguiendo el mismo criterio que con startTime y endTime, compongo mediante fórmulas en la tabla
+        // de eventos y leo aquí una fecha de fin de repetición como: dia_fin_repetición + hora_inicio para
+        // utilizar a la hora de definir la recurrencia de la sesión (evento).
+        const endDateTime = evento[PARAM.eventos.colEndDateTime - 1];
         
         // ⚠️ Si cadena vacía, split() devuelve un array que contiene una cadena vacía (en lugar de un array vacío)
-        const dias = evento[PARAM.eventos.colDias - 1].split('-');
+        const dias = evento[PARAM.eventos.colDias - 1].split(PARAM.eventos.separadorDias);
         const descripcion = evento[PARAM.eventos.colDescripcion - 1];
 
         // Se usa try para tratar situaciones que no permiten generar el evento como excepciones, evitando IFs...
@@ -122,6 +128,7 @@ function m_CrearEventos() {
           // no ocurre cuando se crean eventos periódicos manualmente desde Calendar.
           // 👍 Con endDate no hay problema, las repeticiones finalizan cuando corresponde.
           const recurrence = CalendarApp.newRecurrence()
+            //.setTimeZone(Session.getTimeZone())
             .addWeeklyRule()
             .onlyOnWeekdays(dias.map(dia => {
               switch (dia) {
@@ -133,7 +140,7 @@ function m_CrearEventos() {
                 case 'S': return CalendarApp.Weekday.SATURDAY; break;
                 case 'D': return CalendarApp.Weekday.SUNDAY; break;
               }
-            })).until(endDate);
+            })).until(endDateTime);
 
           // Los eventos de clases se crearán en el calendario público del instructor,
           // en su caso invitando a la sala y al propio instructor (mejora: permitir reserva de múltiples salas por evento).
@@ -202,6 +209,9 @@ function m_CrearEventos() {
 
       });
 
+      // Preparar botón de conmutación general de selección para que ACTIVE todas las casillas de verificación si se han desmarcado
+      if (checkDesmarcar) PropertiesService.getScriptProperties().setProperty(PARAM.propiedadEstadoCheck, false);
+
       // Resumen del resultado de la operación
       mostrarMensaje('Proceso terminado.', 2);
       alerta('🟢 Creados: ' + creados + '\n🟠 Omitidos: ' + omitidos,  SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
@@ -266,6 +276,9 @@ function m_EliminarEventos() {
         SpreadsheetApp.flush();
 
       });
+
+      // Preparar botón de conmutación general de selección para que ACTIVE todas las casillas de verificación si se han desmarcado
+      if (checkDesmarcar) PropertiesService.getScriptProperties().setProperty(PARAM.propiedadEstadoCheck, false);
 
       // Resumen del resultado de la operación
       mostrarMensaje('Proceso terminado.', 2);

@@ -160,19 +160,21 @@ function botonCheckEventos() {
  * @param   {number}                colCheck          Nº de la columna donde se encuentran las casillas de verificación.
  * @param   {number}                [colDatos]        Nº de la columna que se usa para determinar si hay datos en cada fila [1].
  * @param   {numFilas}              [numFilas]        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()` [0].
+ * @param   {boolean}               [estado]          Establece opcionalmente el estado de las casillas al valor indicado, se ignora si `null`o `u
  * @param   {string}                [propiedadEstado] Clave de las `ScriptProperties` que guardará el estado actual de las casillas [`'estadoCheck01'`].
  * 
- * @return  {number} Número de casillas de verificación actualizadas.
+ * @return  {number}  Número de casillas de verificación actualizadas.
  */
-function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, propiedadEstado = 'estadoCheck01') {
+function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, estado, propiedadEstado = PARAM.propiedadEstadoCheck) {
 
   numFilas = !numFilas ? hoja.getLastRow() - filCheck + 1 : numFilas;
 
   // Uso el almacén del script porque puede administrarse desde el editor,
   // pero lo adecuado es emplear el del documento (⚠️ imprescindible en un complemento).
   const propiedadesDoc = PropertiesService.getScriptProperties();
-  const estado = JSON.parse(propiedadesDoc.getProperty(propiedadEstado));
   let numCheckActivos;
+  if (estado == undefined || estado == null) estado = JSON.parse(propiedadesDoc.getProperty(propiedadEstado));
+  else estado = !estado;
 
   if (colDatos > 1) {
 
@@ -185,13 +187,8 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, pr
 
   if (numCheckActivos > 0) {
 
-    if (estado) {
-      hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(false);
-      propiedadesDoc.setProperty(propiedadEstado, false);
-    } else {
-      hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(true);
-      propiedadesDoc.setProperty(propiedadEstado, true)
-    }
+    hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(!estado);
+    propiedadesDoc.setProperty(propiedadEstado, !estado);
 
   }
 
@@ -224,15 +221,15 @@ function eliminarEventosPreviosRegistro(grupo, clase) {
 
       if (evento[PARAM.registro.colGrupo - 1] == grupo && evento[PARAM.registro.colClase - 1] == clase) {
         return [...listaEventos,
-          {
-            fila: PARAM.registro.filEncabezado + indice + 1,
-            idEvento: evento[PARAM.registro.colIdEv - 1],
-            idCalendario: evento[PARAM.registro.colIdCal - 1]
-          }];
+        {
+          fila: PARAM.registro.filEncabezado + indice + 1,
+          idEvento: evento[PARAM.registro.colIdEv - 1],
+          idCalendario: evento[PARAM.registro.colIdCal - 1]
+        }];
       } else return listaEventos;
 
-    },[]);
-    
+    }, []);
+
   //console.info(eventosEliminar);
 
   let eventosEliminados = 0;
@@ -251,13 +248,13 @@ function eliminarEventosPreviosRegistro(grupo, clase) {
         CalendarApp.getCalendarById(evento.idCalendario).getEventSeriesById(evento.idEvento).deleteEventSeries();
         eventosEliminados++;
 
-      } catch(e) {
+      } catch (e) {
 
         // Sin tratamiento, simplemente se registra el error
         console.info('Excepción: ' + evento + '\n' + e.message);
 
       }
-    
+
     });
   }
 
