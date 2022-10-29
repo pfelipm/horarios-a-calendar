@@ -11,14 +11,14 @@
 function m_ObtenerCalInstructores() {
 
   const hojaActual = SpreadsheetApp.getActiveSheet();
-  hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
+  hojaInstructores = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
   SpreadsheetApp.flush();
 
   if (alerta('Se sobreescribirán los calendarios existentes') == SpreadsheetApp.getUi().Button.OK) {
 
     mostrarMensaje('Buscando calendarios de instructores...');
     
-    const prefijo = hoja.getRange(PARAM.instructores.prefijo).getValue();
+    const prefijo = hojaInstructores.getRange(PARAM.instructores.prefijo).getValue();
     const calendarios = CalendarApp.getAllCalendars().reduce((lista, calendario) => {
       if (calendario.getName().startsWith(prefijo)) return [...lista, [calendario.getName(), calendario.getId()]];
       else return lista;
@@ -27,16 +27,17 @@ function m_ObtenerCalInstructores() {
     if (calendarios && calendarios.length > 0) {
 
       // Escribe datos en la tabla (hoja), solo se borra la columna con los ID obtenidos previamente,
-      // las iniciales e emails se mantienen
+      // las iniciales e emails se mantienen para facilitar su reutilización.
+      // Mejora: Guardar lista de calendarios en otra hoja y usar un desplegable para asignar a cada instructor
       actualizarDatosTabla(
-        hoja,
+        hojaInstructores,
         calendarios.sort(([nombre1, id1], [nombre2, id2]) => nombre1.localeCompare(nombre2)),
         PARAM.instructores.filEncabezado + 1,
-        PARAM.instructores.colNombreCal);
+        PARAM.instructores.colNombreCalObtenido);
       
       // Eliminar filas sobrantes y mostrar mensajes de resultado
-      hoja.getRange(PARAM.instructores.ultEjecucion).setValue(new Date());
-      reducirHoja(hoja);
+      hojaInstructores.getRange(PARAM.instructores.ultEjecucion).setValue(new Date());
+      reducirHoja(hojaInstructores);
       mostrarMensaje(`Se han obtenido ${calendarios.length} calendarios.`,5);
         
     } else mostrarMensaje('No se han encontrado calendarios.',5);

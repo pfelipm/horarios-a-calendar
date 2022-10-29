@@ -11,8 +11,9 @@ function onOpen() {
   SpreadsheetApp.getUi().createMenu('🗓️ Horarios a Calendar')
     .addItem('➕ Generar/actualizar clases en Calendar', 'm_CrearEventos')
     .addItem('✖️ Eliminar clases en Calendar', 'm_EliminarEventos')
+    .addItem('♻️ Borrar resultados proceso', 'm_EliminarResultados')
     .addSeparator()
-    .addItem('🧑‍🏫 Buscar calendarios instructores', 'm_ObtenerCalInstructores')
+    .addItem('👥 Buscar calendarios instructores', 'm_ObtenerCalInstructores')
     .addItem('🏫 Buscar salas', 'm_ObtenerSalas')
     .addSeparator()
     .addItem(`💡 Acerca de ${PARAM.nombre}`, 'acercaDe')
@@ -199,33 +200,38 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, es
 /**
  * Busca cada ocurrencia del evento caracterizado por grupo y clase
  * en la tabla de la hoja de registro de eventos `PARAM.registro.hoja` y
- * si existen:
+ * si existen y su fecha de creación es anterior a `selloTiempoProceso`: 
  * 
  *  1. Elimina el evento de calendario asociado
  *  2. Elimina la fila de la tabla en la que se ha hallado.
  * 
  * (!) Si la tabla no ha sido manipulada y no se han producido errores, solo debería
- * darse una única coincidencia, no obstante se comprueban múltiples.
+ * darse una única coincidencia, no obstante se comprueban/eliminan posibles múltiples.
  * 
- * @param   {string}  grupo Código de grupo de la clase.
- * @param   {string}  clase Código de la clase.
+ * @param   {string}  grupo               Código de grupo de la clase.
+ * @param   {string}  clase               Código de la clase.
+ * @param   {Object}  selloTiempoProceso  Objeto de la clase JS Date.
  * 
  * @return  {number}  Número de filas / eventos eliminados
  */
-function eliminarEventosPreviosRegistro(grupo, clase) {
+function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
 
   const hojaRegistro = SpreadsheetApp.getActive().getSheetByName(PARAM.registro.hoja);
 
   const eventosEliminar = leerDatosHoja(hojaRegistro, PARAM.registro.filEncabezado + 1)
     .reduce((listaEventos, evento, indice) => {
 
-      if (evento[PARAM.registro.colGrupo - 1] == grupo && evento[PARAM.registro.colClase - 1] == clase) {
-        return [...listaEventos,
-        {
-          fila: PARAM.registro.filEncabezado + indice + 1,
-          idEvento: evento[PARAM.registro.colIdEv - 1],
-          idCalendario: evento[PARAM.registro.colIdCal - 1]
-        }];
+      if (
+        evento[PARAM.registro.colGrupo - 1] == grupo &&
+        evento[PARAM.registro.colClase - 1] == clase &&
+        evento[PARAM.registro.colFechaProceso - 1] < selloTiempoProceso
+      ) {
+          return [...listaEventos,
+          {
+            fila: PARAM.registro.filEncabezado + indice + 1,
+            idEvento: evento[PARAM.registro.colIdEv - 1],
+            idCalendario: evento[PARAM.registro.colIdCal - 1]
+          }];
       } else return listaEventos;
 
     }, []);

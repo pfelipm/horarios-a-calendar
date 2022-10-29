@@ -49,12 +49,13 @@ const PARAM = {
 
   // Tabla de instructores
   instructores: {
-    hoja: '🧑‍🏫 Instructores',
+    hoja: '👥 Instructores',
     filEncabezado: 5,
     colIniciales: 2,
     colEmail: 3,
     colNombreCal: 4,
     colIdCal: 5,
+    colNombreCalObtenido: 6,
     prefijo: 'B2',
     ultEjecucion: 'E2'
   },
@@ -74,6 +75,7 @@ const PARAM = {
     filEncabezado: 2,
     colGrupo: 1,
     colClase: 2,
+    colFechaProceso: 10,
     colIdEv: 11,
     colIdCal: 12
   }

@@ -17,15 +17,14 @@
  * los eventos generados y tener que hacer una búsqueda por fuerza bruta en todos los calendarios de instructores.
  */
 function m_CrearEventos() {
-  
+
   const hojaActual = SpreadsheetApp.getActiveSheet();
-  hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
+  const hdc = SpreadsheetApp.getActive();
+  const hojaEventos = hdc.getSheetByName(PARAM.eventos.hoja).activate();
   SpreadsheetApp.flush();
 
   if (alerta('Se crearán o actualizarán eventos para las clases seleccionadas.') == SpreadsheetApp.getUi().Button.OK) {
 
-    const hdc = SpreadsheetApp.getActive();
-    const hojaEventos = hdc.getSheetByName(PARAM.eventos.hoja);
     const hojaRegistro = hdc.getSheetByName(PARAM.registro.hoja);
     let creados = 0;
     let omitidos = 0;
@@ -60,6 +59,10 @@ function m_CrearEventos() {
 
       // Vamos a crear eventos. Como en principio no serán muchos opto por actualizar la hoja de datos
       // cada vez que se crea un evento, a sabiendas de que no es óptimo y ralentizará el proceso.
+      // Usaremos un sello de tiempo común para todos los eventos generados en cada proceso de los
+      // generados en procesos anteriores, de este modo se podrán eliminar de manera segura sin "pisar"
+      // otras sesiones (eventos) de la misma clase incluidos en el proceso actual.
+      const selloTiempoProceso = new Date();
       eventosFilas.forEach(eventoFila => {
 
         // Fila con información de cada evento leída de la hoja de eventos
@@ -88,7 +91,7 @@ function m_CrearEventos() {
         // de eventos y leo aquí una fecha de fin de repetición como: dia_fin_repetición + hora_inicio para
         // utilizar a la hora de definir la recurrencia de la sesión (evento).
         const endDateTime = evento[PARAM.eventos.colEndDateTime - 1];
-        
+
         // ⚠️ Si cadena vacía, split() devuelve un array que contiene una cadena vacía (en lugar de un array vacío)
         const dias = evento[PARAM.eventos.colDias - 1].split(PARAM.eventos.separadorDias);
         const descripcion = evento[PARAM.eventos.colDescripcion - 1];
@@ -98,17 +101,21 @@ function m_CrearEventos() {
 
           // ¿Localizamos en la tabla de instructores las iniciales del asignado a esta clase?
           const instructor = instructores.find(instructor => instructor[PARAM.instructores.colIniciales - 1] == evento[PARAM.eventos.colInstructor - 1]);
-          if (!instructor) throw '⭕ Instructor no existe';
+          if (!instructor) throw '⭕ Falta calendario instructor';
 
           // Si es que sí, obtenemos su calendario público y su calendario privado (si hay que invitarle al evento de su clase)
           const idCalendario = instructor[PARAM.instructores.colIdCal - 1];
+          if (!idCalendario) throw '⭕ Calendario instructor innacesible';
+
           const calendario = CalendarApp.getCalendarById(idCalendario);
 
           // Comprobar: qué pasa con la coma al añadir sala si email_instructor = ''
           let guests = checkInvitarInstructores ? instructor[PARAM.instructores.colEmail - 1] : '';
 
-          // ¿Deseamos reservar una sala?
-          if (checkReservarEspacios) {
+          // ¿Deseamos reservar una sala? Lanzaremos excepciíon si se cumplen ambas:
+          //   a) Se ha indicado que se deben reservar espacios
+          //   b) Se ha establecido aula (espacio) para la clase
+          if (checkReservarEspacios && evento[PARAM.eventos.colAula - 1]) {
             const sala = salas.find(sala => sala[PARAM.salas.colNombre - 1] == evento[PARAM.eventos.colAula - 1]);
             if (!sala) throw '⭕ Aula no existe';
             else guests = `${guests},${sala[PARAM.salas.colIdCal - 1]}`;
@@ -120,8 +127,6 @@ function m_CrearEventos() {
           if (!endTime) throw '⭕ Falta hora fin';
           if (!dias[0]) throw '⭕ Falta días';
           if (!calendario) throw '⭕ Falta calendario instructor';
-
-          // Aquí toca comprobar si esa sesión (GRUPO, CLASE) ya se ha generado POR HACER
 
           // ⚠️ Es necesario que el día de la semana de startTime coincida con el 1º en la serie según la recurrencia, de  lo contrario
           // se genera una repetación fantasma en el día indicado, aunque no forme parte de los establecidos para la repetición. Esto
@@ -145,14 +150,15 @@ function m_CrearEventos() {
           // Los eventos de clases se crearán en el calendario público del instructor,
           // en su caso invitando a la sala y al propio instructor (mejora: permitir reserva de múltiples salas por evento).
 
-          // Eliminar posibles eventos ya creados previamente para este grupo y clase, no se usa el valor devuelto (nº eliminados)
-          eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1]);
-          
+          // Eliminar posibles eventos ya creados previamente para este grupo y clase
+          const previos = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1], selloTiempoProceso);
+
           // ...y ahora generamos los nuevos
           const eventoCalendar = calendario.createEventSeries(title, startTime, endTime, recurrence,
             {
               description: descripcion,
               guests: guests,
+              // Mejora: ajuste para invitar a instructores pero no enviarles invitaciones
               sendInvites: checkInvitarInstructores
             });
           eventoCalendar.setTag(tag, tag); // Por ahora no se usa para nada
@@ -160,7 +166,7 @@ function m_CrearEventos() {
             idEvento: eventoCalendar.getId(),
             idCalendario: idCalendario,
             selloTiempo: new Date(),
-            mensaje: '🟢 Evento creado',
+            mensaje: previos > 0 ? '🟣 Evento actualizado' : '🟢 Evento creado',
             fila: eventoFila.fila
           };
           creados++;
@@ -203,21 +209,21 @@ function m_CrearEventos() {
 
           }
 
-          SpreadsheetApp.flush();
-
         }
 
       });
+
+      SpreadsheetApp.flush();
 
       // Preparar botón de conmutación general de selección para que ACTIVE todas las casillas de verificación si se han desmarcado
       if (checkDesmarcar) PropertiesService.getScriptProperties().setProperty(PARAM.propiedadEstadoCheck, false);
 
       // Resumen del resultado de la operación
       mostrarMensaje('Proceso terminado.', 2);
-      alerta('🟢 Creados: ' + creados + '\n🟠 Omitidos: ' + omitidos,  SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
-    
+      alerta('🟢 Creados: ' + creados + '\n🟠 Omitidos: ' + omitidos, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
+
     }
-  
+
   } else hojaActual.activate();
 
 }
@@ -231,12 +237,11 @@ function m_CrearEventos() {
 function m_EliminarEventos() {
 
   const hojaActual = SpreadsheetApp.getActiveSheet();
-  hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
+  const hojaEventos = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
   SpreadsheetApp.flush();
 
   if (alerta('Se eliminarán los eventos asociados a las clases seleccionadas.') == SpreadsheetApp.getUi().Button.OK) {
 
-    const hojaEventos = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja);
     const checkDesmarcar = hojaEventos.getRange(PARAM.eventos.checkDesmarcarProcesados).getValue();
     const checkBorrarPrevios = hojaEventos.getRange(PARAM.eventos.checkBorrarPrevios).getValue();
     let eliminados = 0;
@@ -256,16 +261,17 @@ function m_EliminarEventos() {
 
       if (checkBorrarPrevios) actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso);
 
+      const selloTiempoProceso = new Date();
       eventosFilas.forEach(eventoFila => {
 
         // Fila con información de cada evento leída de la hoja de eventos
         const evento = eventoFila.ajustes;
 
-        const instanciasEliminadas = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1]);
-              
+        const instanciasEliminadas = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1], selloTiempoProceso);
+
         // Actualizar tabla (columnas Fecha proceso y Resultado)
         hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colFechaProceso, 1, 2)
-          .setValues([[new Date(), instanciasEliminadas > 0 ? '✖️ Evento eliminado' : '⭕ Evento no encontrado']]);
+          .setValues([[new Date(), instanciasEliminadas > 0 ? `✖️ Eliminados [${instanciasEliminadas}]` : '❔ No existe o ya eliminado']]);
 
         // Desmarcar selección, si se ha seleccionado esa opción...
         if (instanciasEliminadas > 0) {
@@ -273,19 +279,35 @@ function m_EliminarEventos() {
           if (checkDesmarcar) hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colCheck, 1, 1).setValue(false);
         } else noHallados++;
 
-        SpreadsheetApp.flush();
-
       });
+
+      SpreadsheetApp.flush();
 
       // Preparar botón de conmutación general de selección para que ACTIVE todas las casillas de verificación si se han desmarcado
       if (checkDesmarcar) PropertiesService.getScriptProperties().setProperty(PARAM.propiedadEstadoCheck, false);
 
       // Resumen del resultado de la operación
       mostrarMensaje('Proceso terminado.', 2);
-      alerta('✖️ Eliminados: ' + eliminados + '\n⭕ No encontrados: ' + noHallados, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
+      alerta('✖️ Eliminados: ' + eliminados + '\n❔ No existen / ya eliminados: ' + noHallados, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
 
     } else mostrarMensaje('No se han seleccionado clases.');
-      
+
   } else hojaActual.activate();
-  
+
+}
+
+/**
+ * Elimina la información de marca de tiempo y resultado del proceso en las columnas de
+ * la tabla de gestión de eventos.
+ */
+function m_EliminarResultados() {
+
+  const hojaActual = SpreadsheetApp.getActiveSheet();
+  hojaEventos = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
+  SpreadsheetApp.flush();
+
+  if (alerta('Se borrarán todas las marcas de tiempo y resultados de la tabla.') == SpreadsheetApp.getUi().Button.OK) {
+    actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso);
+  } else hojaActual.activate();
+
 }

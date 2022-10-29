@@ -9,7 +9,7 @@
 function m_ObtenerSalas() {
 
   const hojaActual = SpreadsheetApp.getActiveSheet();
-  hoja = SpreadsheetApp.getActive().getSheetByName(PARAM.salas.hoja).activate();
+  hojaSalas = SpreadsheetApp.getActive().getSheetByName(PARAM.salas.hoja).activate();
   SpreadsheetApp.flush();
 
   if (alerta('Se sobreescribirán las salas existentes') == SpreadsheetApp.getUi().Button.OK) {
@@ -29,11 +29,11 @@ function m_ObtenerSalas() {
     if (salas && salas.length > 0) {
       
       // Escribe datos en la tabla (hoja)
-      actualizarDatosTabla(hoja, salas, PARAM.salas.filEncabezado + 1, PARAM.salas.colDatos);
+      actualizarDatosTabla(hojaSalas, salas, PARAM.salas.filEncabezado + 1, PARAM.salas.colDatos);
       
       // Eliminar filas sobrantes y mostrar mensajes de resultado
-      reducirHoja(hoja);
-      hoja.getRange(PARAM.salas.ultEjecucion).setValue(new Date());
+      reducirHoja(hojaSalas);
+      hojaSalas.getRange(PARAM.salas.ultEjecucion).setValue(new Date());
       mostrarMensaje(`Se han obtenido ${salas.length} salas.`,5);
 
     } else mostrarMensaje('No se han encontrado salas.',5);
