@@ -18,12 +18,17 @@
  */
 function m_CrearEventos() {
 
+  // Nos movemos a la hoja de gestión de eventos antes de solicitar confirmación
   const hojaActual = SpreadsheetApp.getActiveSheet();
   const hdc = SpreadsheetApp.getActive();
   const hojaEventos = hdc.getSheetByName(PARAM.eventos.hoja).activate();
   SpreadsheetApp.flush();
 
   if (alerta('Se crearán o actualizarán eventos para las clases seleccionadas.') == SpreadsheetApp.getUi().Button.OK) {
+
+    // ##################################################
+    // ### Preparativos y lectura de datos necesarios ###
+    // ##################################################
 
     const hojaRegistro = hdc.getSheetByName(PARAM.registro.hoja);
     let creados = 0;
@@ -36,7 +41,7 @@ function m_CrearEventos() {
     const checkBorrarPrevios = hojaEventos.getRange(PARAM.eventos.checkBorrarPrevios).getValue();
     const tag = PARAM.eventos.tag;
 
-    // Leer datos necesarios para la generación de los eventos en Calendar.
+    // Leer datos de instructores y salas registradas
     const instructores = leerDatosHoja(hdc.getSheetByName(PARAM.instructores.hoja), PARAM.instructores.filEncabezado + 1);
     const salas = leerDatosHoja(hdc.getSheetByName(PARAM.salas.hoja), PARAM.salas.filEncabezado + 1);
 
@@ -57,24 +62,43 @@ function m_CrearEventos() {
 
       if (checkBorrarPrevios) actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso);
 
-      // Vamos a crear eventos. Como en principio no serán muchos opto por actualizar la hoja de datos
-      // cada vez que se crea un evento, a sabiendas de que no es óptimo y ralentizará el proceso.
-      // Usaremos un sello de tiempo común para todos los eventos generados en cada proceso de los
-      // generados en procesos anteriores, de este modo se podrán eliminar de manera segura sin "pisar"
-      // otras sesiones (eventos) de la misma clase incluidos en el proceso actual.
+      // ######################################
+      // ### Bucle de proceso de las clases ###
+      // ######################################
+      //
+      // [1] Construir título de los eventos.
+      // [2] Obtener valores de echas / hora de inicio y fin.
+      // [3] Obtener calendario público del instructor y opcionalmente privado para enviar invitación
+      // [4] OPCIONAL: Obtener sala a reservar.
+      // [5] Construir y generar el evento de clase en Google Calendar.
+      // [6] Registrar resulado e información de la clase y del evento generado en la tabla de registro de eventos.
+      // [7] Mostrar resultado de la operación en la tabla de gestión de eventos.
+      //
+      // Como en principio no serán muchas opto por actualizar la hoja de datos cada vez que se procesa un evento,
+      // a sabiendas de que no es óptimo y ralentizará el proceso. Usaremos un sello de tiempo común para
+      // diferenciar todos los eventos generados en cada proceso de los generados en procesos anteriores, de este
+      // modo se podrán eliminar de manera segura sin "pisar" otras sesiones (eventos) de la misma clase incluidos
+      // en las clases incluidias en el proceso actual.
+
       const selloTiempoProceso = new Date();
       eventosFilas.forEach(eventoFila => {
 
         // Fila con información de cada evento leída de la hoja de eventos
         const evento = eventoFila.ajustes;
 
-        // Objeto que contiene el resultado de la operación de generación del evento en calendar
+        // Objeto que contiene el resultado de la operación de generación del evento en calendar:
         // { idEvento, idCalendario, selloTiempo, mensaje }
         let resultado;
 
-        // Título del evento: Grupo + Clase + (iniciales instructor)
+        // #####################################################################
+        // ### [1] Título del evento: Grupo + Clase + (iniciales instructor) ###
+        // #####################################################################
+
         const title = `${evento[PARAM.eventos.colGrupo - 1]} ${evento[PARAM.eventos.colClase - 1]} (${evento[PARAM.eventos.colInstructor - 1]})`;
-        const endDate = evento[PARAM.eventos.colDiaFinRep - 1]; // No usado, en su lugar utilizaremos endDateTime
+        
+        // ########################################################################################################
+        // ### [2] Gestión de fecha/hora de INICIO y FIN de la primera repetición y fecha(+ ajuste hora) de FIN ###
+        // ########################################################################################################
 
         // ⚠️ Marcianada al leer celdas con datos de hora sin fecha:
         // Ej, celda: 17:00:00 (formateada como hora) >> Objeto Date:Sat Dec 30 1899 17:24:05 GMT+0009 (Central European Standard Time) 😵‍💫
@@ -86,7 +110,7 @@ function m_CrearEventos() {
         const startTime = evento[PARAM.eventos.colStartTime - 1];
         const endTime = evento[PARAM.eventos.colEndTime - 1];
 
-        // Además, pasa esta marcianda https://issuetracker.google.com/issues/236615807
+        // Además, tenemos esta otra marcianada https://issuetracker.google.com/issues/236615807
         // ...siguiendo el mismo criterio que con startTime y endTime, compongo mediante fórmulas en la tabla
         // de eventos y leo aquí una fecha de fin de repetición como: dia_fin_repetición + hora_inicio para
         // utilizar a la hora de definir la recurrencia de la sesión (evento).
@@ -96,42 +120,91 @@ function m_CrearEventos() {
         const dias = evento[PARAM.eventos.colDias - 1].split(PARAM.eventos.separadorDias);
         const descripcion = evento[PARAM.eventos.colDescripcion - 1];
 
+        // ### AQUÍ LA GENERACIÓN DE EVENTOS ######
+
         // Se usa try para tratar situaciones que no permiten generar el evento como excepciones, evitando IFs...
+        
         try {
 
-          // ¿Localizamos en la tabla de instructores las iniciales del asignado a esta clase?
-          const instructor = instructores.find(instructor => instructor[PARAM.instructores.colIniciales - 1] == evento[PARAM.eventos.colInstructor - 1]);
-          if (!instructor) throw '⭕ Falta calendario instructor';
+          // #####################################################################
+          // ### [3] Gestión de calendarios de INSTRUCTORES (público, privado) ###
+          // #####################################################################
 
-          // Si es que sí, obtenemos su calendario público y su calendario privado (si hay que invitarle al evento de su clase)
-          const idCalendario = instructor[PARAM.instructores.colIdCal - 1];
-          if (!idCalendario) throw '⭕ Calendario instructor innacesible';
+          let guests = '';
 
+          // a) ¿La clase tiene instructor?
+          const instructorClase = evento[PARAM.eventos.colInstructor - 1];
+          if (!instructorClase) throw '⭕ Falta instructor';
+          
+          // b) ¿Localizamos en la tabla de instructores las iniciales del asignado a esta clase?
+          const infoInstructor = instructores.find(instructor => instructor[PARAM.instructores.colIniciales - 1] == instructorClase);
+          if (!infoInstructor) throw '⭕ Instructor no registrado';
+
+          // c) ¿Existe en la tabla el ID de su calendario público donde se generará el evento?
+          const idCalendario = infoInstructor[PARAM.instructores.colIdCal - 1];
+          if (!idCalendario) throw '⭕ Falta ID calendario instructor';
+
+          // d) ¿El calendario realmente existe?
           const calendario = CalendarApp.getCalendarById(idCalendario);
+          if (!calendario) throw '⭕ Calendario instructor innacesible';
 
-          // Comprobar: qué pasa con la coma al añadir sala si email_instructor = ''
-          let guests = checkInvitarInstructores ? instructor[PARAM.instructores.colEmail - 1] : '';
-
-          // ¿Deseamos reservar una sala? Lanzaremos excepciíon si se cumplen ambas:
-          //   a) Se ha indicado que se deben reservar espacios
-          //   b) Se ha establecido aula (espacio) para la clase
-          if (checkReservarEspacios && evento[PARAM.eventos.colAula - 1]) {
-            const sala = salas.find(sala => sala[PARAM.salas.colNombre - 1] == evento[PARAM.eventos.colAula - 1]);
-            if (!sala) throw '⭕ Aula no existe';
-            else guests = `${guests},${sala[PARAM.salas.colIdCal - 1]}`;
+          // e) ¿Se debe enviar una invitación al instructor? (opcional)
+          
+          if (checkInvitarInstructores) {
+            guests = infoInstructor[PARAM.instructores.colEmail - 1];
+            // Por defecto no se lanza excepción cuando falta email instructor para enviar invitación,
+            // Parametrizable en constante PARAM.
+            if (!guests && !PARAM.permitirOmitirEmailInstructor) throw '⭕ Falta email instructor';
           }
 
-          // ¿Tenemos todos los datos necesarios para generar el evento?
-          if (!endDate) throw '⭕ Falta fecha fin';
-          if (!startTime) throw '⭕ Falta hora inicio';
-          if (!endTime) throw '⭕ Falta hora fin';
-          if (!dias[0]) throw '⭕ Falta días';
-          if (!calendario) throw '⭕ Falta calendario instructor';
 
-          // ⚠️ Es necesario que el día de la semana de startTime coincida con el 1º en la serie según la recurrencia, de  lo contrario
-          // se genera una repetación fantasma en el día indicado, aunque no forme parte de los establecidos para la repetición. Esto
-          // no ocurre cuando se crean eventos periódicos manualmente desde Calendar.
-          // 👍 Con endDate no hay problema, las repeticiones finalizan cuando corresponde.
+          // ################################################
+          // ### [4] Gestión de la reserva de AULA (sala) ###
+          // ################################################  
+          // Para acomodar ciertos casos límite en mi centro, *por defecto* solo lanzaremos una excepción si se cumplen todas:
+          //   a) Se ha indicado que se deben reservar espacios.
+          //   b) El aula indicada para la clase es una cadena vacía.
+          //   c) El aula indicada para la clase no se encuentra en la tabla de salas.
+          // Parametrizable en constante PARAM.
+          if (checkReservarEspacios) {
+            
+            const aulaClase = evento[PARAM.eventos.colAula - 1]; 
+            if (!aulaClase && !PARAM.permitirOmitirSala) throw '⭕ Falta aula';
+            
+            if (aulaClase) {
+
+              const infoSala = salas.find(sala => sala[PARAM.salas.colNombre - 1] == aulaClase);
+              if (!infoSala) throw '⭕ Aula no registrada';
+              
+              const idSala = infoSala[PARAM.salas.colIdCal - 1];
+              if (!idSala) throw '⭕ Falta ID calendario aula';
+
+              const testSala = CalendarApp.getCalendarById(idSala);
+              if (!testSala) throw '⭕ Calendario aula inaccesible';
+
+              guests = guests ? `${guests},${idSala}` : `${infoSala[PARAM.salas.colIdCal - 1]}`;
+            
+            }
+            
+          }
+
+          // ##############################################################
+          // ### [5] Generación de evento recurrente en Google Calendar ###
+          // ##############################################################
+
+          // Comprobaciones previas a la generación del evento
+          if (!evento[PARAM.eventos.colHoraInicio - 1] || !startTime) throw '⭕ Falta hora inicio';
+          if (!evento[PARAM.eventos.colHoraFin - 1] || !endTime) throw '⭕ Falta hora fin';
+          if (!evento[PARAM.eventos.colDiaFinRep - 1] || !endDateTime) throw '⭕ Falta fecha fin';
+          if (endTime <= startTime) throw '⭕ Hora fin ≤ hora inicio';
+          if (evento[PARAM.eventos.colDiaFinRep - 1] < evento[PARAM.eventos.colDiaInicioRep - 1]) throw '⭕ Día fin < Día inicio';
+          if (!dias[0]) throw '⭕ Falta días semana repetición';
+
+          // ⚠️ Es necesario que el día de la semana de startTime coincida con uno de los indicados en la regla de recurrencia,
+          // de lo contrario se genera una repetición fantasma en el día indicado, aunque no forme parte de los usados en dicha
+          // regla. ¡Esto no ocurre cuando se crean eventos periódicos manualmente desde Calendar!
+          // 👍 Con la fecha de finalización de la recurrencia no hay problema, las repeticiones finalizan cuando corresponde.
+          
           const recurrence = CalendarApp.newRecurrence()
             //.setTimeZone(Session.getTimeZone())
             .addWeeklyRule()
@@ -148,7 +221,8 @@ function m_CrearEventos() {
             })).until(endDateTime);
 
           // Los eventos de clases se crearán en el calendario público del instructor,
-          // en su caso invitando a la sala y al propio instructor (mejora: permitir reserva de múltiples salas por evento).
+          // en su caso invitando a la sala y al propio instructor.
+          // ➕ Mejora: permitir reserva de múltiples salas por evento.
 
           // Eliminar posibles eventos ya creados previamente para este grupo y clase
           const previos = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1], selloTiempoProceso);
@@ -158,7 +232,7 @@ function m_CrearEventos() {
             {
               description: descripcion,
               guests: guests,
-              // Mejora: ajuste para invitar a instructores pero no enviarles invitaciones
+              // ➕ Mejora: ajuste para invitar a instructores pero no enviarles invitaciones
               sendInvites: checkInvitarInstructores
             });
           eventoCalendar.setTag(tag, tag); // Por ahora no se usa para nada
@@ -166,24 +240,29 @@ function m_CrearEventos() {
             idEvento: eventoCalendar.getId(),
             idCalendario: idCalendario,
             selloTiempo: new Date(),
-            mensaje: previos > 0 ? '🟣 Evento actualizado' : '🟢 Evento creado',
+            mensaje: previos > 0 ? `🟣 Evento actualizado [${previos}]` : '🟢 Evento creado',
             fila: eventoFila.fila
           };
           creados++;
 
         } catch (e) {
 
+          // Capturar mensaje de excepción, controlada o no
           if (typeof e == 'string') resultado = { selloTiempo: new Date(), mensaje: e }
           else resultado = { selloTiempo: new Date(), mensaje: `🚨 ${e.message}` };
           omitidos++;
 
         } finally {
 
-          // Actualizar tabla (columnas Fecha proceso y Resultado)
+          // ####################################################################################################
+          // ### [6] Registrar resultado de la operación y archivar evento en la tabla de registro de eventos ###
+          // ####################################################################################################
+
+          // a) Resultado en columnas Fecha proceso y Resultado de la tabla de gestión de eventos
           hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colFechaProceso, 1, 2)
             .setValues([[resultado.selloTiempo, resultado.mensaje]]);
 
-          // Si el evento se ha podido crear...
+          // b) Si el evento se ha podido crear, archivar en tabla de registro de eventos
           if (resultado.idEvento) {
 
             // Desmarcar selección, si se ha seleccionado esa opción...
@@ -220,7 +299,7 @@ function m_CrearEventos() {
 
       // Resumen del resultado de la operación
       mostrarMensaje('Proceso terminado.', 2);
-      alerta('🟢 Creados: ' + creados + '\n🟠 Omitidos: ' + omitidos, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
+      alerta('🟢 Generados: ' + creados + '\n⭕ Omitidos: ' + omitidos, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
 
     }
 
@@ -236,6 +315,7 @@ function m_CrearEventos() {
  */
 function m_EliminarEventos() {
 
+// Nos movemos a la hoja de gestión de eventos antes de solicitar confirmación
   const hojaActual = SpreadsheetApp.getActiveSheet();
   const hojaEventos = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
   SpreadsheetApp.flush();
@@ -271,7 +351,7 @@ function m_EliminarEventos() {
 
         // Actualizar tabla (columnas Fecha proceso y Resultado)
         hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colFechaProceso, 1, 2)
-          .setValues([[new Date(), instanciasEliminadas > 0 ? `✖️ Eliminados [${instanciasEliminadas}]` : '❔ No existe o ya eliminado']]);
+          .setValues([[new Date(), instanciasEliminadas > 0 ? `✖️ Eliminado [${instanciasEliminadas}]` : '❔ No existe o ya eliminado']]);
 
         // Desmarcar selección, si se ha seleccionado esa opción...
         if (instanciasEliminadas > 0) {
@@ -302,6 +382,7 @@ function m_EliminarEventos() {
  */
 function m_EliminarResultados() {
 
+  // Nos movemos a la hoja de gestión de eventos antes de solicitar confirmación
   const hojaActual = SpreadsheetApp.getActiveSheet();
   hojaEventos = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
   SpreadsheetApp.flush();

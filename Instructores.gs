@@ -10,6 +10,7 @@
  */
 function m_ObtenerCalInstructores() {
 
+// Nos movemos a la hoja de gestión de instructores antes de solicitar confirmación
   const hojaActual = SpreadsheetApp.getActiveSheet();
   hojaInstructores = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
   SpreadsheetApp.flush();

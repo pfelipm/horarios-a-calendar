@@ -241,7 +241,7 @@ function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
   let eventosEliminados = 0;
   if (eventosEliminar && eventosEliminar.length > 0) {
 
-    // Se comienza desde el final de la hoja para que los números de filas sigan siendo válidos tras cada eliminación
+    // Se comienza desde el final de la hoja para que los números de fila sigan siendo válidos tras cada eliminación
     eventosEliminar.reverse().forEach(evento => {
 
       try {
@@ -249,7 +249,7 @@ function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
         // El evento asociado a la clase puede existir en la tabla de registro de eventos pero no en
         // Calendar. Perseguimos sincronicidad, por tanto siempre se borrará en la tabla, aunque solo
         // se incrementará la cuenta de eliminados si realmente se ha eliminado un evento del calendario.
-        // Mejora: diferenciar ambos casos a la hora de devolver información de resultado.
+        // ➕ Mejora: diferenciar ambos casos a la hora de devolver información de resultado.
         hojaRegistro.deleteRow(evento.fila);
         CalendarApp.getCalendarById(evento.idCalendario).getEventSeriesById(evento.idEvento).deleteEventSeries();
         eventosEliminados++;

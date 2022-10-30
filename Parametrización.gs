@@ -1,8 +1,12 @@
 /**************************************************************************
  * Horarios-a-Calendar (HaC)                                              *
- * Una herramienta que te ayuda a transformar horarios de clase a eventos *
- * recurrentes en Google Calendar                                         *
- * Pablo Felip (@pfelipm)                                                 *
+ *                                                                        *
+ * Una herramienta que te ayuda a transformar horarios de clase eneventos *
+ * recurrentes en Google Calendar.                                        *
+ *                                                                        *
+ * Copyright (C) Pablo Felip (@pfelipm) v1.0 NOV 2022                     *
+ * Se distribuye bajo licencia GNU GPL v3.                                *
+ *                                                                        *
  **************************************************************************
  *
  * @OnlyCurrentDoc
@@ -14,10 +18,14 @@
  */
 const PARAM = {
   nombre: 'HaC',
-  version: 'Versión 1.0 (octubre 2022)',
+  version: 'Versión 1.0 (noviembre 2022)',
   icono: '🗓️',
   urlRepoGitHub: 'https://github.com/pfelipm/horarios-a-calendar',
   propiedadEstadoCheck: 'estadoCheck01',
+  
+  // Constantes funcionales
+  permitirOmitirEmailInstructor: true, // FALSE si se desea lanzar excepción cuando se invita a instructores pero falta puntualmente email
+  permitirOmitirSala: true, // FALSE si se desea lanzar excepción cuando se reservan espacios pero puntualmente no se ha asignado aula
 
   // Tabla de eventos
   eventos: {
