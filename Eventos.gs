@@ -192,12 +192,12 @@ function m_CrearEventos() {
           // ### [5] Generación de evento recurrente en Google Calendar ###
           // ##############################################################
 
-          // Comprobaciones previas a la generación del evento
+          // Comprobaciones previas a la generación del evento (algunas ya se fuerzan en la hoja de gestión de eventos)
           if (!evento[PARAM.eventos.colHoraInicio - 1] || !startTime) throw '⭕ Falta hora inicio';
           if (!evento[PARAM.eventos.colHoraFin - 1] || !endTime) throw '⭕ Falta hora fin';
           if (!evento[PARAM.eventos.colDiaFinRep - 1] || !endDateTime) throw '⭕ Falta fecha fin';
-          if (endTime <= startTime) throw '⭕ Hora fin ≤ hora inicio';
-          if (evento[PARAM.eventos.colDiaFinRep - 1] < evento[PARAM.eventos.colDiaInicioRep - 1]) throw '⭕ Día fin < Día inicio';
+          if (endTime <= startTime) throw '⭕ Hora fin < hora inicio';
+          if (evento[PARAM.eventos.colDiaFinRep - 1] < evento[PARAM.eventos.colDiaInicioRep - 1]) throw '⭕ Día fin ≤ Día inicio';
           if (!dias[0]) throw '⭕ Falta días semana repetición';
 
           // ⚠️ Es necesario que el día de la semana de startTime coincida con uno de los indicados en la regla de recurrencia,
