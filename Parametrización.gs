@@ -52,7 +52,7 @@ const PARAM = {
     checkReservarEspacios: 'G3',
     checkDesmarcarProcesados: 'J2',
     checkBorrarPrevios: 'J3',
-    tag: '#HaC' // Utilizado para marcar los eventos creados, sin uso efectivo
+    tag: '#HaC' // Utilizado para marcar los eventos creados, sin utilidad efectiva
   },
 
   // Tabla de instructores
