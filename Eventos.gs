@@ -45,8 +45,8 @@ function m_CrearEventos() {
     const instructores = leerDatosHoja(hdc.getSheetByName(PARAM.instructores.hoja), PARAM.instructores.filEncabezado + 1);
     const salas = leerDatosHoja(hdc.getSheetByName(PARAM.salas.hoja), PARAM.salas.filEncabezado + 1);
 
-    // Obtener las clases seleccionados de la tabla para las que deben generarse eventos, se descartan
-    // las clases en filas en las que falta grupo o clase, además se anota la fila de cada clase para
+    // Obtener las clases seleccionados de la tabla para las que deben generarse eventos, SE IGNORAN
+    // LAS CLASES EN FILAS EN LAS QUE FALTA GRUPO O CLASE, además se anota la fila de cada clase para
     // mostrar información del resultado de la operación en su lugar correcto más tarde.
     const eventosFilas = leerDatosHoja(hojaEventos, PARAM.eventos.filEncabezado + 1)
       .map((evento, indice) => { return { ajustes: evento, fila: indice + 1 } })
@@ -153,7 +153,7 @@ function m_CrearEventos() {
           if (checkInvitarInstructores) {
             guests = infoInstructor[PARAM.instructores.colEmail - 1];
             // Por defecto no se lanza excepción cuando falta email instructor para enviar invitación,
-            // Parametrizable en constante PARAM.
+            // Parametrizable mediante constante PARAM.permitirOmitirEmailInstructor.
             if (!guests && !PARAM.permitirOmitirEmailInstructor) throw '⭕ Falta email instructor';
           }
 
@@ -163,9 +163,9 @@ function m_CrearEventos() {
           // ################################################  
           // Para acomodar ciertos casos límite en mi centro, *por defecto* solo lanzaremos una excepción si se cumplen todas:
           //   a) Se ha indicado que se deben reservar espacios.
-          //   b) El aula indicada para la clase es una cadena vacía.
-          //   c) El aula indicada para la clase no se encuentra en la tabla de salas.
-          // Parametrizable en constante PARAM.
+          //   b) El aula indicada para la clase no es una cadena vacía.
+          //   c) El aula indicada para la clase no se encuentra en la tabla de salas o falta ID o calendario innacesible
+          // Parametrizable mediante constante PARAM.permitirOmitirSala.
           if (checkReservarEspacios) {
             
             const aulaClase = evento[PARAM.eventos.colAula - 1]; 
