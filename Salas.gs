@@ -55,7 +55,7 @@ function obtenerSalas() {
   let recursos = [];
   let pageToken;
 
-  // Dentro de bloque try por si se ejecuta en una cuenta 
+  // Dentro de bloque try por si se ejecuta en una cuenta personal
   try {
 
     do {

@@ -328,7 +328,7 @@ function m_EliminarEventos() {
     let noHallados = 0;
 
     // Obtener las clases seleccionadas de la tabla cuyos eventos deben tratarse de eliminar,
-    // se descartan las clases en las filas en las que falta grupo o clase.
+    // SE IGNORAN LAS CLASES EN FILAS EN LAS QUE FALTA GRUPO O CLASE,
     const eventosFilas = leerDatosHoja(hojaEventos, PARAM.eventos.filEncabezado + 1)
       .map((evento, indice) => { return { ajustes: evento, fila: indice + 1 } })
       .filter(eventoFila => eventoFila.ajustes[PARAM.eventos.colCheck - 1] == true
