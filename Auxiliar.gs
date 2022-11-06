@@ -200,7 +200,7 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, es
 /**
  * Busca cada ocurrencia del evento caracterizado por grupo y clase
  * en la tabla de la hoja de registro de eventos `PARAM.registro.hoja` y
- * si existen y su fecha de creación es anterior a `selloTiempoProceso`: 
+ * si existe y su fecha de creación es anterior a `selloTiempoProceso`: 
  * 
  *  1. Elimina el evento de calendario asociado
  *  2. Elimina la fila de la tabla en la que se ha hallado.
