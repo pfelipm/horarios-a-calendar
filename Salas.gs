@@ -45,6 +45,8 @@ function m_ObtenerSalas() {
 
 /**
  * Devuelve una lista de los recursos del dominio de tipo `CONFERENCE_ROOM`.
+ * Puede ser invocada por un usuario sin previlegios administrativos, dadoque
+ * la información de recursos de calendario es pública en el el dominio.
  * 
  * @return {Array<Admin_directory_v1.Admin.Directory_v1.Schema.CalendarResource>} Lista de salas
  */
@@ -53,6 +55,7 @@ function obtenerSalas() {
   let recursos = [];
   let pageToken;
 
+  // Dentro de bloque try por si se ejecuta en una cuenta 
   try {
 
     do {
