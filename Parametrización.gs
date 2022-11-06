@@ -1,13 +1,13 @@
 /**************************************************************************
- * Horarios-a-Calendar (HaC)                                              *
- *                                                                        *
- * Una herramienta que te ayuda a transformar horarios de clase eneventos *
- * recurrentes en Google Calendar.                                        *
- *                                                                        *
- * Copyright (C) Pablo Felip (@pfelipm) v1.0 NOV 2022                     *
- * Se distribuye bajo licencia GNU GPL v3.                                *
- *                                                                        *
- **************************************************************************
+ * Horarios-a-Calendar (HaC)                                               *
+ *                                                                         *
+ * Una herramienta que te ayuda a transformar horarios de clase en eventos *
+ * recurrentes en Google Calendar.                                         *
+ *                                                                         *
+ * Copyright (C) Pablo Felip (@pfelipm) v1.0 NOV 2022                      *
+ * Se distribuye bajo licencia GNU GPL v3.                                 *
+ *                                                                         *
+ ***************************************************************************
  *
  * @OnlyCurrentDoc
  */

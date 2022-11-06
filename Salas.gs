@@ -52,22 +52,28 @@ function obtenerSalas() {
 
   let recursos = [];
   let pageToken;
-  
-  do {
 
-    const respuesta = AdminDirectory.Resources.Calendars.list('my_customer',
-      {
-        maxResults: 100,
-        orderBy: 'resourceName asc',
-        pageToken: pageToken,
-        query: 'resourceCategory=CONFERENCE_ROOM'
-      });
-    if (respuesta) {
-      recursos = recursos.concat(respuesta.items);
-      pageToken = respuesta.nextPageToken;
-    }
-  
-  } while (pageToken);
+  try {
+
+    do {
+
+      const respuesta = AdminDirectory.Resources.Calendars.list('my_customer',
+        {
+          maxResults: 100,
+          orderBy: 'resourceName asc',
+          pageToken: pageToken,
+          query: 'resourceCategory=CONFERENCE_ROOM'
+        });
+      if (respuesta) {
+        recursos = recursos.concat(respuesta.items);
+        pageToken = respuesta.nextPageToken;
+      }
+    
+    } while (pageToken);
+
+  } catch (e) {
+    alerta('⚠️ Error al obtener la lista de salas del dominio.', SpreadsheetApp.getUi().ButtonSet.OK);
+  }
 
   return recursos;
 
