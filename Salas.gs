@@ -2,6 +2,7 @@
  * Funciones para gestionar la hoja de salas (recursos)
  ******************************************************/
 
+
 /**
  * Función invocada desde el menú del script.
  * escribe en la hoja de cálculo la lista de salas del dominio
@@ -14,7 +15,7 @@ function m_ObtenerSalas() {
   SpreadsheetApp.flush();
 
   if (alerta('Se sobreescribirán las salas existentes') == SpreadsheetApp.getUi().Button.OK) {
-    
+
     mostrarMensaje('Buscando salas en el dominio...');
 
     const salas = obtenerSalas().map(recurso =>
@@ -28,16 +29,16 @@ function m_ObtenerSalas() {
     );
 
     if (salas && salas.length > 0) {
-      
+
       // Escribe datos en la tabla (hoja)
       actualizarDatosTabla(hojaSalas, salas, PARAM.salas.filEncabezado + 1, PARAM.salas.colDatos);
-      
+
       // Eliminar filas sobrantes y mostrar mensajes de resultado
       reducirHoja(hojaSalas);
       hojaSalas.getRange(PARAM.salas.ultEjecucion).setValue(new Date());
-      mostrarMensaje(`Se han obtenido ${salas.length} salas.`,5);
+      mostrarMensaje(`Se han obtenido ${salas.length} salas.`, 5);
 
-    } else mostrarMensaje('No se han encontrado salas.',5);
+    } else mostrarMensaje('No se han encontrado salas.', 5);
 
   } else hojaActual.activate();
 
@@ -71,7 +72,7 @@ function obtenerSalas() {
         recursos = recursos.concat(respuesta.items);
         pageToken = respuesta.nextPageToken;
       }
-    
+
     } while (pageToken);
 
   } catch (e) {

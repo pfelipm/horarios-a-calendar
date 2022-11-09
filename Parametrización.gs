@@ -22,7 +22,7 @@ const PARAM = {
   icono: '🗓️',
   urlRepoGitHub: 'https://github.com/pfelipm/horarios-a-calendar',
   propiedadEstadoCheck: 'estadoCheck01',
-  
+
   // Constantes funcionales
   permitirOmitirEmailInstructor: true, // FALSE si se desea lanzar excepción cuando se invita a instructores pero falta puntualmente email
   permitirOmitirSala: true, // FALSE si se desea lanzar excepción cuando se reservan espacios pero puntualmente no se ha asignado aula

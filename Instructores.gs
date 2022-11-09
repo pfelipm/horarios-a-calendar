@@ -2,6 +2,7 @@
  * Funciones para gestionar la hoja de instructores *
  ****************************************************/
 
+
 /**
  * Función invocada desde el menú del script.
  * Escribe en la tabla de calendario de instructores los ID (emails)
@@ -10,7 +11,7 @@
  */
 function m_ObtenerCalInstructores() {
 
-// Nos movemos a la hoja de gestión de instructores antes de solicitar confirmación
+  // Nos movemos a la hoja de gestión de instructores antes de solicitar confirmación
   const hojaActual = SpreadsheetApp.getActiveSheet();
   hojaInstructores = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
   SpreadsheetApp.flush();
@@ -18,12 +19,12 @@ function m_ObtenerCalInstructores() {
   if (alerta('Se sobreescribirán los calendarios existentes') == SpreadsheetApp.getUi().Button.OK) {
 
     mostrarMensaje('Buscando calendarios de instructores...');
-    
+
     const prefijo = hojaInstructores.getRange(PARAM.instructores.prefijo).getValue();
     const calendarios = CalendarApp.getAllCalendars().reduce((lista, calendario) => {
       if (calendario.getName().startsWith(prefijo)) return [...lista, [calendario.getName(), calendario.getId()]];
       else return lista;
-    },[]);
+    }, []);
 
     if (calendarios && calendarios.length > 0) {
 
@@ -35,14 +36,14 @@ function m_ObtenerCalInstructores() {
         calendarios.sort(([nombre1, id1], [nombre2, id2]) => nombre1.localeCompare(nombre2)),
         PARAM.instructores.filEncabezado + 1,
         PARAM.instructores.colNombreCalObtenido);
-      
+
       // Eliminar filas sobrantes y mostrar mensajes de resultado
       hojaInstructores.getRange(PARAM.instructores.ultEjecucion).setValue(new Date());
       reducirHoja(hojaInstructores);
-      mostrarMensaje(`Se han obtenido ${calendarios.length} calendarios.`,5);
-        
-    } else mostrarMensaje('No se han encontrado calendarios.',5);
-  
+      mostrarMensaje(`Se han obtenido ${calendarios.length} calendarios.`, 5);
+
+    } else mostrarMensaje('No se han encontrado calendarios.', 5);
+
   } else hojaActual.activate();
 
 }

@@ -24,7 +24,7 @@ function m_CrearEventos() {
   const hojaEventos = hdc.getSheetByName(PARAM.eventos.hoja).activate();
   SpreadsheetApp.flush();
 
-  if (alerta('Se crearán o actualizarán eventos para las clases seleccionadas.') == SpreadsheetApp.getUi().Button.OK) {
+  if (alerta('Se crearán eventos nuevos para las clases seleccionadas, los ya existentes serán eliminados.') == SpreadsheetApp.getUi().Button.OK) {
 
     // ##################################################
     // ### Preparativos y lectura de datos necesarios ###
@@ -58,7 +58,18 @@ function m_CrearEventos() {
 
     if (eventosFilas.length > 0) {
 
-      mostrarMensaje('Generando eventos asociados a las clases...');
+      // Identificar y eliminar eventos previos en Calendar para las clases que se desean procesar, 
+      // eliminar eventos previos uno a uno dentro del bucle de generación no es buena idea puesto que
+      // podrían producirse conflictos a la hora de reservar espacios, por ejemplo cuando dos sesiones
+      // de distintas clases del mismo grupo que se imparten en la misma aula, cuyos eventos ya han sido
+      // generados previamente, intercambian horas y vuelve ha realizarse la generación con ese cambio.
+      // ⚠️ La contrapartida es que los eventos ya existentes se eliminarán todos a la vez, aunque podría
+      // ser que posteriomente no se generasen nuevas versiones por falta de datos o errores.
+      mostrarMensaje('Eliminando eventos previos asociados a las clases ✖️...');
+      const previos = eliminarEventosPreviosRegistroMultiple(eventosFilas);
+
+      // Aquí comienza realmente la fiesta
+      mostrarMensaje('Generando eventos asociados a las clases ➕...');
 
       if (checkBorrarPrevios) actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso);
 
@@ -83,7 +94,7 @@ function m_CrearEventos() {
       const selloTiempoProceso = new Date();
       eventosFilas.forEach(eventoFila => {
 
-        // Fila con información de cada evento leída de la hoja de eventos
+        // Datos de cada clase leída de la hoja de generación de eventos que va a procesarse
         const evento = eventoFila.ajustes;
 
         // Objeto que contiene el resultado de la operación de generación del evento en calendar:
@@ -95,7 +106,7 @@ function m_CrearEventos() {
         // #####################################################################
 
         const title = `${evento[PARAM.eventos.colGrupo - 1]} ${evento[PARAM.eventos.colClase - 1]} (${evento[PARAM.eventos.colInstructor - 1]})`;
-        
+
         // ########################################################################################################
         // ### [2] Gestión de fecha/hora de INICIO y FIN de la primera repetición y fecha(+ ajuste hora) de FIN ###
         // ########################################################################################################
@@ -123,7 +134,7 @@ function m_CrearEventos() {
         // ### AQUÍ LA GENERACIÓN DE EVENTOS ######
 
         // Se usa try para tratar situaciones que no permiten generar el evento como excepciones, evitando IFs...
-        
+
         try {
 
           // #####################################################################
@@ -135,7 +146,7 @@ function m_CrearEventos() {
           // a) ¿La clase tiene instructor?
           const instructorClase = evento[PARAM.eventos.colInstructor - 1];
           if (!instructorClase) throw '⭕ Falta instructor';
-          
+
           // b) ¿Localizamos en la tabla de instructores las iniciales del asignado a esta clase?
           const infoInstructor = instructores.find(instructor => instructor[PARAM.instructores.colIniciales - 1] == instructorClase);
           if (!infoInstructor) throw '⭕ Instructor no registrado';
@@ -149,7 +160,7 @@ function m_CrearEventos() {
           if (!calendario) throw '⭕ Calendario instructor innacesible';
 
           // e) ¿Se debe enviar una invitación al instructor? (opcional)
-          
+
           if (checkInvitarInstructores) {
             guests = infoInstructor[PARAM.instructores.colEmail - 1];
             // Por defecto no se lanza excepción cuando falta email instructor para enviar invitación,
@@ -167,15 +178,15 @@ function m_CrearEventos() {
           //   c) El aula indicada para la clase no se encuentra en la tabla de salas o falta ID o calendario innacesible
           // Parametrizable mediante constante PARAM.permitirOmitirSala.
           if (checkReservarEspacios) {
-            
-            const aulaClase = evento[PARAM.eventos.colAula - 1]; 
+
+            const aulaClase = evento[PARAM.eventos.colAula - 1];
             if (!aulaClase && !PARAM.permitirOmitirSala) throw '⭕ Falta aula';
-            
+
             if (aulaClase) {
 
               const infoSala = salas.find(sala => sala[PARAM.salas.colNombre - 1] == aulaClase);
               if (!infoSala) throw '⭕ Aula no registrada';
-              
+
               const idSala = infoSala[PARAM.salas.colIdCal - 1];
               if (!idSala) throw '⭕ Falta ID calendario aula';
 
@@ -183,9 +194,9 @@ function m_CrearEventos() {
               if (!testSala) throw '⭕ Calendario aula inaccesible';
 
               guests = guests ? `${guests},${idSala}` : `${infoSala[PARAM.salas.colIdCal - 1]}`;
-            
+
             }
-            
+
           }
 
           // ##############################################################
@@ -204,7 +215,7 @@ function m_CrearEventos() {
           // de lo contrario se genera una repetición fantasma en el día indicado, aunque no forme parte de los usados en dicha
           // regla. ¡Esto no ocurre cuando se crean eventos periódicos manualmente desde Calendar!
           // 👍 Con la fecha de finalización de la recurrencia no hay problema, las repeticiones finalizan cuando corresponde.
-          
+
           const recurrence = CalendarApp.newRecurrence()
             //.setTimeZone(Session.getTimeZone())
             .addWeeklyRule()
@@ -224,8 +235,10 @@ function m_CrearEventos() {
           // en su caso invitando a la sala y al propio instructor.
           // ➕ Mejora: permitir reserva de múltiples salas por evento.
 
-          // Eliminar posibles eventos ya creados previamente para este grupo y clase
-          const previos = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1], selloTiempoProceso);
+          // Eliminar posibles eventos ya creados previamente para este grupo y clase,
+          // esto está descartado y procede de una versión preliminar del script, te lo dejo
+          // por si te apetece jugar con esta alternativa funcional.
+          // const previos = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1], selloTiempoProceso);
 
           // ...y ahora generamos los nuevos
           const eventoCalendar = calendario.createEventSeries(title, startTime, endTime, recurrence,
@@ -240,7 +253,9 @@ function m_CrearEventos() {
             idEvento: eventoCalendar.getId(),
             idCalendario: idCalendario,
             selloTiempo: new Date(),
-            mensaje: previos > 0 ? `🟣 Evento actualizado [${previos}]` : '🟢 Evento creado',
+            // Esto tampoco se utiliza ya, se usaba cuando se borraban los eventos previosgenerado uno a uno
+            // mensaje: previos > 0 ? `🟣 Evento actualizado [${previos}]` : '🟢 Evento creado',
+            mensaje: '🟢 Evento generado',
             fila: eventoFila.fila
           };
           creados++;
@@ -298,8 +313,11 @@ function m_CrearEventos() {
       if (checkDesmarcar) PropertiesService.getScriptProperties().setProperty(PARAM.propiedadEstadoCheck, false);
 
       // Resumen del resultado de la operación
-      mostrarMensaje('Proceso terminado.', 2);
-      alerta('🟢 Generados: ' + creados + '\n⭕ Omitidos: ' + omitidos, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
+      mostrarMensaje('Proceso terminado.', 5);
+      alerta(
+        '🟢 Generados: ' + creados + '\n⭕ Omitidos: ' + omitidos + '\n✖️ Eliminados: ' + previos,
+        SpreadsheetApp.getUi().ButtonSet.OK,
+        'Eventos procesados');
 
     }
 
@@ -315,7 +333,7 @@ function m_CrearEventos() {
  */
 function m_EliminarEventos() {
 
-// Nos movemos a la hoja de gestión de eventos antes de solicitar confirmación
+  // Nos movemos a la hoja de gestión de eventos antes de solicitar confirmación
   const hojaActual = SpreadsheetApp.getActiveSheet();
   const hojaEventos = SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja).activate();
   SpreadsheetApp.flush();
@@ -337,7 +355,7 @@ function m_EliminarEventos() {
 
     if (eventosFilas.length > 0) {
 
-      mostrarMensaje('Eliminando eventos asociados a las clases...');
+      mostrarMensaje('Eliminando eventos previos asociados a las clases ✖️....');
 
       if (checkBorrarPrevios) actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso);
 
@@ -347,7 +365,11 @@ function m_EliminarEventos() {
         // Fila con información de cada evento leída de la hoja de eventos
         const evento = eventoFila.ajustes;
 
-        const instanciasEliminadas = eliminarEventosPreviosRegistro(evento[PARAM.eventos.colGrupo - 1], evento[PARAM.eventos.colClase - 1], selloTiempoProceso);
+        const instanciasEliminadas = eliminarEventosPreviosRegistro(
+          evento[PARAM.eventos.colGrupo - 1],
+          evento[PARAM.eventos.colClase - 1],
+          selloTiempoProceso
+        );
 
         // Actualizar tabla (columnas Fecha proceso y Resultado)
         hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colFechaProceso, 1, 2)
@@ -367,7 +389,7 @@ function m_EliminarEventos() {
       if (checkDesmarcar) PropertiesService.getScriptProperties().setProperty(PARAM.propiedadEstadoCheck, false);
 
       // Resumen del resultado de la operación
-      mostrarMensaje('Proceso terminado.', 2);
+      mostrarMensaje('Proceso terminado.', 5);
       alerta('✖️ Eliminados: ' + eliminados + '\n❔ No existen / ya eliminados: ' + noHallados, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
 
     } else mostrarMensaje('No se han seleccionado clases.');

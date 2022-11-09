@@ -202,11 +202,15 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, es
  * en la tabla de la hoja de registro de eventos `PARAM.registro.hoja` y
  * si existe y su fecha de creación es anterior a `selloTiempoProceso`: 
  * 
- *  1. Elimina el evento de calendario asociado
- *  2. Elimina la fila de la tabla en la que se ha hallado.
+ *  1. Elimina el evento de calendario asociado.
+ *  2. Elimina la fila de la hoja de registros en la que se encontraba.
  * 
- * (!) Si la tabla no ha sido manipulada y no se han producido errores, solo debería
- * darse una única coincidencia, no obstante se comprueban/eliminan posibles múltiples.
+ * (!) Cada par (Grupo, Clase) puede tener múltiples coincidencias en la tabla
+ * de registro de eventos, correspondientes a distintas sesiones semanales.
+ * 
+ * ¡Cuidado! Esto podría eliminar de Calendar las clases del curso anterior,
+ * si es que aún se mantuvieran en la tabla de registro de eventos (poco probable),
+ * a menos que se diferenciaran de algún modo, por ejemplo sufijo curso en grupo (Ej: DAM2 22/23).
  * 
  * @param   {string}  grupo               Código de grupo de la clase.
  * @param   {string}  clase               Código de la clase.
@@ -217,8 +221,7 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, es
 function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
 
   const hojaRegistro = SpreadsheetApp.getActive().getSheetByName(PARAM.registro.hoja);
-
-  const eventosEliminar = leerDatosHoja(hojaRegistro, PARAM.registro.filEncabezado + 1)
+  const eventosRegistroEliminar = leerDatosHoja(hojaRegistro, PARAM.registro.filEncabezado + 1)
     .reduce((listaEventos, evento, indice) => {
 
       if (
@@ -226,23 +229,23 @@ function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
         evento[PARAM.registro.colClase - 1] == clase &&
         evento[PARAM.registro.colFechaProceso - 1] < selloTiempoProceso
       ) {
-          return [...listaEventos,
-          {
-            fila: PARAM.registro.filEncabezado + indice + 1,
-            idEvento: evento[PARAM.registro.colIdEv - 1],
-            idCalendario: evento[PARAM.registro.colIdCal - 1]
-          }];
+        return [...listaEventos,
+        {
+          fila: PARAM.registro.filEncabezado + indice + 1,
+          idEvento: evento[PARAM.registro.colIdEv - 1],
+          idCalendario: evento[PARAM.registro.colIdCal - 1]
+        }];
       } else return listaEventos;
 
     }, []);
 
-  //console.info(eventosEliminar);
+  //console.info(eventosRegistroEliminar);
 
   let eventosEliminados = 0;
-  if (eventosEliminar && eventosEliminar.length > 0) {
+  if (eventosRegistroEliminar && eventosRegistroEliminar.length > 0) {
 
     // Se comienza desde el final de la hoja para que los números de fila sigan siendo válidos tras cada eliminación
-    eventosEliminar.reverse().forEach(evento => {
+    eventosRegistroEliminar.reverse().forEach(evento => {
 
       try {
 
@@ -255,10 +258,132 @@ function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
         eventosEliminados++;
 
       } catch (e) {
-
         // Sin tratamiento, simplemente se registra el error
         console.info('Excepción: ' + evento + '\n' + e.message);
+      }
 
+    });
+  }
+
+  return eventosEliminados;
+
+}
+
+function foo() {
+
+  const hdc = SpreadsheetApp.getActive();
+  const hojaEventos = hdc.getSheetByName(PARAM.eventos.hoja);
+  const eventosFilas = leerDatosHoja(hojaEventos, PARAM.eventos.filEncabezado + 1)
+    .map((evento, indice) => { return { ajustes: evento, fila: indice + 1 } })
+    .filter(eventoFila => eventoFila.ajustes[PARAM.eventos.colCheck - 1] == true
+      && eventoFila.ajustes[PARAM.eventos.colGrupo - 1] != ''
+      && eventoFila.ajustes[PARAM.eventos.colClase - 1] != '');
+
+  // console.info(eventosFilas);
+  console.info(eliminarEventosPreviosRegistroMultiple(eventosFilas));
+
+}
+
+/**
+ * Busca cada ocurrencia de los eventos caracterizado por grupo y clase
+ * que figuran en la tabla de clases a generar con los que se encuentran
+ * en la hoja de registro de eventos `PARAM.registro.hoja` y si existe: 
+ * 
+ *  1. Elimina el evento de calendario asociado.
+ *  2. Elimina la fila de la hoja de registros en la que se encontraba.
+ * 
+ * (!) Cada par (Grupo, Clase) puede tener múltiples coincidencias en la tabla
+ * de registro de eventos, correspondientes a distintas sesiones semanales.
+ *
+ * Se diferencia de `eliminarEventosPreviosRegistro`en que en este caso se
+ * realiza el borrado de los eventos asociados a todas las clases de una vez,
+ * en lugar de una a una a medida que se procesa cada clase en la tabla de
+ * generación.
+ *  
+ * ¡Cuidado! Esto podría eliminar de Calendar las clases del curso anterior,
+ * si es que aún se mantuvieran en la tabla de registro de eventos (poco probable),
+ * a menos que se diferenciaran de algún modo, por ejemplo sufijo curso en grupo (Ej: DAM2 22/23).
+ *  
+ * @param   {Array<Object>}  eventosFilas  Tabla de eventos a procesar, [{ ajustes }, { fila:[] }]
+ * 
+ * @return  {number}  Número de filas / eventos eliminados
+ */
+function eliminarEventosPreviosRegistroMultiple(eventosFilas) {
+
+  const hojaRegistro = SpreadsheetApp.getActive().getSheetByName(PARAM.registro.hoja);
+
+  // Leer eventos registrados e indexar para no perder referencia de fila, dado que se eliminarán
+  // de la matriz las marcadas para eliminar en Calendar
+  const eventosRegistro = leerDatosHoja(hojaRegistro, PARAM.registro.filEncabezado + 1)
+    .map((eventoRegistro, indice) => ({ ajustes: eventoRegistro, fila: indice }));
+
+  const eventosRegistroEliminar = [];
+  const clasesYaProcesadas = new Set();
+
+  // Recorremos la lista de clases (Grupo, Clase) cuyos eventos previos deben eliminarse
+  eventosFilas.forEach(eventoFila => {
+
+    // Simplemente concatenar grupo + clase o grupo + separador + clase NO es seguro como clave única
+    // Revisar código de acoplar() para una explicación más detallada en un caso similar
+    const claveUnica = JSON.stringify([eventoFila.ajustes[PARAM.eventos.colGrupo - 1], eventoFila.ajustes[PARAM.eventos.colClase - 1]]);
+
+    // ¿Se han buscado ya eventos registrados de la clase caracterizada por (Grupo, Clase)?
+    if (!clasesYaProcesadas.has(claveUnica)) {
+
+      // Recorremos la tabla de eventos registrados buscando todos los del mismo grupo y clase que el que se desea eliminar
+      const filasEliminar = eventosRegistro.reduce((filasEliminar, evento) => {
+
+        if (
+          evento.ajustes[PARAM.registro.colGrupo - 1] == eventoFila.ajustes[PARAM.eventos.colGrupo - 1] &&
+          evento.ajustes[PARAM.registro.colClase - 1] == eventoFila.ajustes[PARAM.eventos.colClase - 1]
+        ) {
+          // Incluir evento en la lista de eliminación de la hoja de registro de eventos y de Calendar
+          eventosRegistroEliminar.push(
+            {
+              fila: PARAM.registro.filEncabezado + evento.fila + 1,
+              idEvento: evento.ajustes[PARAM.registro.colIdEv - 1],
+              idCalendario: evento.ajustes[PARAM.registro.colIdCal - 1]
+            }
+          );
+          return [...filasEliminar, evento.fila];
+        }
+        return filasEliminar;
+
+      }, []);
+
+      // Eliminamos las filas con eventos ya marcados para eliminar de la matriz
+      filasEliminar.forEach(indiceFila => eventosRegistro.splice(indiceFila, 1));
+
+      // Clase ya procesada, no volveremos a intentar encontrar eventos relacionados
+      clasesYaProcesadas.add(claveUnica);
+
+    }
+
+  });
+
+  console.info(eventosRegistroEliminar);
+
+  let eventosEliminados = 0;
+  if (eventosRegistroEliminar.length > 0) {
+
+    console.info(eventosRegistroEliminar.sort((evento1, evento2) => evento2.fila - evento1.fila));
+
+    // Borrar eventos en orden decreciente de fila para que los números de fila sigan siendo válidos tras cada eliminación
+    eventosRegistroEliminar.sort((evento1, evento2) => evento2.fila - evento1.fila).forEach(evento => {
+
+      try {
+
+        // El evento asociado a la clase puede existir en la tabla de registro de eventos pero no en
+        // Calendar. Perseguimos sincronicidad, por tanto siempre se borrará en la tabla, aunque solo
+        // se incrementará la cuenta de eliminados si realmente se ha eliminado un evento del calendario.
+        // ➕ Mejora: diferenciar ambos casos a la hora de devolver información de resultado.
+        hojaRegistro.deleteRow(evento.fila);
+        CalendarApp.getCalendarById(evento.idCalendario).getEventSeriesById(evento.idEvento).deleteEventSeries();
+        eventosEliminados++;
+
+      } catch (e) {
+        // Sin tratamiento, simplemente se registra el error
+        console.info('Excepción: ' + evento + '\n' + e.message);
       }
 
     });
