@@ -69,7 +69,7 @@ function m_CrearEventos() {
       const previos = eliminarEventosPreviosRegistroMultiple(eventosFilas);
 
       // Aquí comienza realmente la fiesta
-      mostrarMensaje('Generando eventos asociados a las clases ➕...');
+      mostrarMensaje('Generando eventos para las clases ➕...');
 
       if (checkBorrarPrevios) actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso);
 

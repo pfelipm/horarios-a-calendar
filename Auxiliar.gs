@@ -148,25 +148,30 @@ function botonCheckEventos() {
     SpreadsheetApp.getActive().getSheetByName(PARAM.eventos.hoja),
     PARAM.eventos.filEncabezado + 1,
     PARAM.eventos.colCheck,
-    2); // 2 == Columna "Grupo"
+    undefined,
+    undefined,
+    true,   
+    // Los checks en filas cuyas columnas 2 (grupo) o 3 (clase) estén vacías se considerarán inacticas y no se modificarán 
+    [2, 3]);
 
 }
 
 /**
  * Conmuta el estado un conjunto de casillas de verificación a partir de la fila indicada de una tabla (hoja).
- * Devuelve el nº de casillas han sido actualizadas.
+ * Devuelve el nº de casillas que han sido actualizadas.
  * 
  * @param   {SpreadsheetApp.Sheet}  hoja              Hoja en la que se encuentra el intervalo con casillas de verificación.
  * @param   {number}                filCheck          Nº de la fila en la que se encuentra la primera casilla de verificación.
  * @param   {number}                colCheck          Nº de la columna donde se encuentran las casillas de verificación.
- * @param   {number}                [colDatos]        Nº de la columna que se usa para determinar si hay datos en cada fila [1].
- * @param   {numFilas}              [numFilas]        Nº de casillas de verificación o '0' si se extienden hasta `lastRow()` [0].
- * @param   {boolean}               [estado]          Establece opcionalmente el estado de las casillas al valor indicado, se ignora si `null`o `u
+ * @param   {number}                numFilas          Nº de casillas de verificación, si `null`o `undefined` se extienden hasta `lastRow()`
+ * @param   {boolean}               estado            Establece opcionalmente el estado de las casillas al valor indicado, se ignora si `null`o `undefined`.
+ * @param   {boolean}               [mayoria]         VERDADERO si se desean conmutar el estado del mayor número posible de casillas [VERDADERO].
+ * @param   {Array}                 [colDatos]        Vector con los números de las columnas que se usan para determinar si hay datos en cada fila [[1]].
  * @param   {string}                [propiedadEstado] Clave de las `ScriptProperties` que guardará el estado actual de las casillas [`'estadoCheck01'`].
  * 
  * @return  {number}  Número de casillas de verificación actualizadas.
  */
-function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, estado, propiedadEstado = PARAM.propiedadEstadoCheck) {
+function conmutarChecks(hoja, filCheck, colCheck, numFilas, estado, mayoria = true, colDatos = [1], propiedadEstado = PARAM.propiedadEstadoCheck) {
 
   numFilas = !numFilas ? hoja.getLastRow() - filCheck + 1 : numFilas;
 
@@ -174,22 +179,40 @@ function conmutarChecks(hoja, filCheck, colCheck, colDatos = 1, numFilas = 0, es
   // pero lo adecuado es emplear el del documento (⚠️ imprescindible en un complemento).
   const propiedadesDoc = PropertiesService.getScriptProperties();
   let numCheckActivos;
-  if (estado == undefined || estado == null) estado = JSON.parse(propiedadesDoc.getProperty(propiedadEstado));
-  else estado = !estado;
+  let nuevoEstado;
 
-  if (colDatos > 1) {
+  if (colDatos.some(col =>  col > 1)) {
 
-    const existen = hoja.getRange(filCheck, colDatos, numFilas).getValues();
-    const indiceUltimoValor = existen.reverse().findIndex(el => el[0] != '');
+    // Generar una matriz con todas las columnas en colDatos
+    const existen = colDatos.reduce((matrizExisten, columna) => {
+
+      const columnaExisten = hoja.getRange(filCheck, columna, numFilas).getValues();
+      if (matrizExisten.length == 0) return columnaExisten;
+      else return matrizExisten.map((filaExisten, fil) =>  [...filaExisten, columnaExisten[fil][0]]);
+
+    }, []);
+
+    // Comprobar en qué filas todas las columnas de comprobación contienen información
+    const indiceUltimoValor = existen.reverse().findIndex(filaExisten => filaExisten.every(col => col != ''));
     if (indiceUltimoValor == -1) numCheckActivos = 0;
     else numCheckActivos = existen.length - indiceUltimoValor;
 
   } else numCheckActivos = numFilas;
 
+  // Ajustar estado casillas de verificación solo si hay casillas activas
   if (numCheckActivos > 0) {
 
-    hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(!estado);
-    propiedadesDoc.setProperty(propiedadEstado, !estado);
+    // En su caso todas las casillas se marcarán o desmarcarán dependiendo de qué acción supone modificar un nº mayor de ellas
+    if (mayoria) {
+      const checks = hoja.getRange(filCheck, colCheck, numCheckActivos).getValues();
+      const marcadas = checks.filter(check => check[0]).length;
+      const desmarcadas = checks.length - marcadas;
+      nuevoEstado = !(marcadas >= desmarcadas);
+    } else if (estado == undefined || estado == null) nuevoEstado = !JSON.parse(propiedadesDoc.getProperty(propiedadEstado));
+    else nuevoEstado = !estado;
+
+    hoja.getRange(filCheck, colCheck, numCheckActivos).setValue(nuevoEstado);
+    propiedadesDoc.setProperty(propiedadEstado, nuevoEstado);
 
   }
 
@@ -266,21 +289,6 @@ function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
   }
 
   return eventosEliminados;
-
-}
-
-function foo() {
-
-  const hdc = SpreadsheetApp.getActive();
-  const hojaEventos = hdc.getSheetByName(PARAM.eventos.hoja);
-  const eventosFilas = leerDatosHoja(hojaEventos, PARAM.eventos.filEncabezado + 1)
-    .map((evento, indice) => { return { ajustes: evento, fila: indice + 1 } })
-    .filter(eventoFila => eventoFila.ajustes[PARAM.eventos.colCheck - 1] == true
-      && eventoFila.ajustes[PARAM.eventos.colGrupo - 1] != ''
-      && eventoFila.ajustes[PARAM.eventos.colClase - 1] != '');
-
-  // console.info(eventosFilas);
-  console.info(eliminarEventosPreviosRegistroMultiple(eventosFilas));
 
 }
 
