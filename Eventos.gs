@@ -22,7 +22,7 @@ function m_CrearEventos() {
   const hojaActual = SpreadsheetApp.getActiveSheet();
   const hdc = SpreadsheetApp.getActive();
   const hojaEventos = hdc.getSheetByName(PARAM.eventos.hoja).activate();
-  SpreadsheetApp.flush();
+  SpreadsheetApp.flush(); // ¡Necesario para que visualmente nos movamos a la hoja activa antes de generar la alerta!
 
   if (alerta('Se crearán eventos nuevos para las clases seleccionadas, los ya existentes serán eliminados.') == SpreadsheetApp.getUi().Button.OK) {
 
@@ -56,7 +56,7 @@ function m_CrearEventos() {
 
     // console.info(eventosFilas);
 
-    if (eventosFilas.length > 0) {
+    if (eventosFilas && eventosFilas.length > 0) {
 
       // Identificar y eliminar eventos previos en Calendar para las clases que se desean procesar, 
       // eliminar eventos previos uno a uno dentro del bucle de generación no es buena idea puesto que
@@ -319,7 +319,7 @@ function m_CrearEventos() {
         SpreadsheetApp.getUi().ButtonSet.OK,
         'Eventos procesados');
 
-    }
+    } else mostrarMensaje('No se han seleccionado clases.');
 
   } else hojaActual.activate();
 
@@ -353,7 +353,7 @@ function m_EliminarEventos() {
         && eventoFila.ajustes[PARAM.eventos.colGrupo - 1] != ''
         && eventoFila.ajustes[PARAM.eventos.colClase - 1] != '');
 
-    if (eventosFilas.length > 0) {
+    if (eventosFilas && eventosFilas.length > 0) {
 
       mostrarMensaje('Eliminando eventos previos asociados a las clases ✖️....');
 

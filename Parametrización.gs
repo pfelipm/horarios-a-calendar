@@ -1,4 +1,4 @@
-/**************************************************************************
+/***************************************************************************
  * Horarios-a-Calendar (HaC)                                               *
  *                                                                         *
  * Una herramienta que te ayuda a transformar horarios de clase en eventos *
@@ -17,15 +17,22 @@
  * Constantes generales de parametrización del script
  */
 const PARAM = {
+
   nombre: 'HaC',
-  version: 'Versión 1.0 (noviembre 2022)',
+  version: 'Versión 1.1 (noviembre 2022)',
   icono: '🗓️',
   urlRepoGitHub: 'https://github.com/pfelipm/horarios-a-calendar',
   propiedadEstadoCheck: 'estadoCheck01',
 
   // Constantes funcionales
-  permitirOmitirEmailInstructor: true, // FALSE si se desea lanzar excepción cuando se invita a instructores pero falta puntualmente email
+  permitirOmitirEmailInstructor: true, // FALSE si se desea lanzar excepción cuando se invita a instructores pero falta puntualmente un email
   permitirOmitirSala: true, // FALSE si se desea lanzar excepción cuando se reservan espacios pero puntualmente no se ha asignado aula
+
+  // Hoja (oculta) que contiene la plantilla del horario
+  plantillaHorario: {
+    hoja: '⏰ Plantilla horario',
+    codigoGrupo: 'D5'
+  },
 
   // Tabla de eventos
   eventos: {
@@ -87,4 +94,5 @@ const PARAM = {
     colIdEv: 11,
     colIdCal: 12
   }
+
 };

@@ -13,18 +13,66 @@ function onOpen() {
     .addItem('✖️ Eliminar clases en Calendar', 'm_EliminarEventos')
     .addItem('♻️ Borrar resultados proceso', 'm_EliminarResultados')
     .addSeparator()
+    .addItem('⏰ Crear nuevo horario semanal', 'm_nuevoHorario')
+    .addSeparator()
     .addItem('👥 Buscar calendarios instructores', 'm_ObtenerCalInstructores')
     .addItem('🏫 Buscar salas', 'm_ObtenerSalas')
     .addSeparator()
-    .addItem(`💡 Acerca de ${PARAM.nombre}`, 'acercaDe')
+    .addItem(`💡 Acerca de ${PARAM.nombre}`, 'm_acercaDe')
     .addToUi();
+
+}
+
+/**
+ * Genera una nueva hora de horario a partir de la plantilla
+ */
+function m_nuevoHorario() {
+
+  const ui = SpreadsheetApp.getUi();
+  const hdc = SpreadsheetApp.getActive();
+  const nombresHojas = hdc.getSheets().map(hoja => hoja.getName().toUpperCase());
+  let codigoOk;
+  let boton;
+
+  do {
+
+    const respuesta = ui.prompt(
+      `${PARAM.icono} ${PARAM.nombre}`,
+      'Introduce el CÓDIGO del horario:\n\n⚠️ Máx. 10 caracteres, por ejemplo: DAM2.\n⚠️ No uses el nombre de una hoja ya existente.\n\n',
+      ui.ButtonSet.OK_CANCEL
+    );
+    codigoGrupo = respuesta.getResponseText().toUpperCase();
+    boton = respuesta.getSelectedButton();
+
+    // Verificar que el código es aceptable antes de intentar generar una nueva hoja con ese nombre
+    codigoOk = codigoGrupo.length > 0 && codigoGrupo.length <=10 && !nombresHojas.includes(codigoGrupo);
+    if (codigoOk && boton == ui.Button.OK) {
+      mostrarMensaje(`[1/2] Preparando horario de clase semanal para «${codigoGrupo}»...`);
+      
+      // Duplicar plantilla, la nueva hoja pasa a ser la activa
+      const hojaPlantilla = hdc.getSheetByName(PARAM.plantillaHorario.hoja);
+      const nuevaHoja = hdc.insertSheet(0, { template: hojaPlantilla }).setName(codigoGrupo);
+
+      // Perrellenar celda con el código de la clase
+      nuevaHoja.getRange(PARAM.plantillaHorario.codigoGrupo).setValue(codigoGrupo);
+      
+      // Replicar la protección de celdas aplicada sobre la plantilla de horario en la nueva hoja de horario semanal
+      mostrarMensaje(`[2/2] Protegiendo celdas con fórmulas en la hoja «${codigoGrupo}»...`);
+      hojaPlantilla.getProtections(SpreadsheetApp.ProtectionType.RANGE)
+         // getProtections() siempre devuelve [], aunque no haya intervalos protegidos
+        .forEach(proteccion => nuevaHoja.getRange(proteccion.getRange().getA1Notation()).protect().setWarningOnly(true));
+
+      mostrarMensaje(`Tu nuevo horario ha sido creado en la hoja «${codigoGrupo}» 🥳, ya puedes comenzar a editarlo.`, 5);
+    }
+
+  } while (!codigoOk && boton != ui.Button.CANCEL);
 
 }
 
 /**
  * Muestra la ventana de información de la aplicación
  */
-function acercaDe() {
+function m_acercaDe() {
 
   let panel = HtmlService.createTemplateFromFile('Acerca de');
   panel.nombre = PARAM.nombre;
@@ -150,7 +198,7 @@ function botonCheckEventos() {
     PARAM.eventos.colCheck,
     undefined,
     undefined,
-    true,   
+    true,
     // Los checks en filas cuyas columnas 2 (grupo) o 3 (clase) estén vacías se considerarán inacticas y no se modificarán 
     [2, 3]);
 
@@ -181,14 +229,14 @@ function conmutarChecks(hoja, filCheck, colCheck, numFilas, estado, mayoria = tr
   let numCheckActivos;
   let nuevoEstado;
 
-  if (colDatos.some(col =>  col > 1)) {
+  if (colDatos.some(col => col > 1)) {
 
     // Generar una matriz con todas las columnas en colDatos
     const existen = colDatos.reduce((matrizExisten, columna) => {
 
       const columnaExisten = hoja.getRange(filCheck, columna, numFilas).getValues();
       if (matrizExisten.length == 0) return columnaExisten;
-      else return matrizExisten.map((filaExisten, fil) =>  [...filaExisten, columnaExisten[fil][0]]);
+      else return matrizExisten.map((filaExisten, fil) => [...filaExisten, columnaExisten[fil][0]]);
 
     }, []);
 
@@ -374,7 +422,7 @@ function eliminarEventosPreviosRegistroMultiple(eventosFilas) {
   let eventosEliminados = 0;
   if (eventosRegistroEliminar.length > 0) {
 
-    console.info(eventosRegistroEliminar.sort((evento1, evento2) => evento2.fila - evento1.fila));
+    // console.info(eventosRegistroEliminar.sort((evento1, evento2) => evento2.fila - evento1.fila));
 
     // Borrar eventos en orden decreciente de fila para que los números de fila sigan siendo válidos tras cada eliminación
     eventosRegistroEliminar.sort((evento1, evento2) => evento2.fila - evento1.fila).forEach(evento => {

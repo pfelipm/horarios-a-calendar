@@ -1,6 +1,6 @@
-/******************************************************
- * Funciones para gestionar la hoja de salas (recursos)
- ******************************************************/
+/********************************************************
+ * Funciones para gestionar la hoja de salas (recursos) *
+ ********************************************************/
 
 
 /**
@@ -14,7 +14,7 @@ function m_ObtenerSalas() {
   hojaSalas = SpreadsheetApp.getActive().getSheetByName(PARAM.salas.hoja).activate();
   SpreadsheetApp.flush();
 
-  if (alerta('Se sobreescribirán las salas existentes') == SpreadsheetApp.getUi().Button.OK) {
+  if (alerta('Se sobreescribirán las salas existentes.') == SpreadsheetApp.getUi().Button.OK) {
 
     mostrarMensaje('Buscando salas en el dominio...');
 
