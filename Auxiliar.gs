@@ -38,28 +38,28 @@ function m_nuevoHorario() {
 
     const respuesta = ui.prompt(
       `${PARAM.icono} ${PARAM.nombre}`,
-      'Introduce el CÓDIGO del horario:\n\n⚠️ Máx. 6 caracteres, por ejemplo: DAM2.\n⚠️ No uses el nombre de una hoja ya existente.\n\n',
+      'Introduce el CÓDIGO del horario:\n\n⚠️ Máx. ' + PARAM.plantillaHorario.longMaxCodigo + ' caracteres, por ejemplo: DAM2.\n⚠️ No uses el nombre de una hoja ya existente.\n\n',
       ui.ButtonSet.OK_CANCEL
     );
     codigoGrupo = respuesta.getResponseText().toUpperCase();
     boton = respuesta.getSelectedButton();
 
     // Verificar que el código es aceptable antes de intentar generar una nueva hoja con ese nombre
-    codigoOk = codigoGrupo.length > 0 && codigoGrupo.length <=10 && !nombresHojas.includes(codigoGrupo);
+    codigoOk = codigoGrupo.length > 0 && codigoGrupo.length <= PARAM.plantillaHorario.longMaxCodigo && !nombresHojas.includes(codigoGrupo);
     if (codigoOk && boton == ui.Button.OK) {
       mostrarMensaje(`[1/2] Preparando horario de clase semanal para «${codigoGrupo}»...`);
-      
+
       // Duplicar plantilla, la nueva hoja pasa a ser la activa
       const hojaPlantilla = hdc.getSheetByName(PARAM.plantillaHorario.hoja);
       const nuevaHoja = hdc.insertSheet(0, { template: hojaPlantilla }).setName(codigoGrupo);
 
       // Perrellenar celda con el código de la clase
       nuevaHoja.getRange(PARAM.plantillaHorario.codigoGrupo).setValue(codigoGrupo);
-      
+
       // Replicar la protección de celdas aplicada sobre la plantilla de horario en la nueva hoja de horario semanal
       mostrarMensaje(`[2/2] Protegiendo celdas con fórmulas en la hoja «${codigoGrupo}»...`);
       hojaPlantilla.getProtections(SpreadsheetApp.ProtectionType.RANGE)
-         // getProtections() siempre devuelve [], aunque no haya intervalos protegidos
+        // getProtections() siempre devuelve [], aunque no haya intervalos protegidos
         .forEach(proteccion => nuevaHoja.getRange(proteccion.getRange().getA1Notation()).protect().setWarningOnly(true));
 
       mostrarMensaje(`Tu nuevo horario ha sido creado en la hoja «${codigoGrupo}» 🥳, ya puedes comenzar a editarlo.`, 5);

@@ -31,7 +31,8 @@ const PARAM = {
   // Hoja (oculta) que contiene la plantilla del horario
   plantillaHorario: {
     hoja: '⏰ Plantilla horario',
-    codigoGrupo: 'D5'
+    codigoGrupo: 'D5',
+    longMaxCodigo: 8
   },
 
   // Tabla de eventos
