@@ -38,7 +38,7 @@ function m_nuevoHorario() {
 
     const respuesta = ui.prompt(
       `${PARAM.icono} ${PARAM.nombre}`,
-      'Introduce el CÓDIGO del horario:\n\n⚠️ Máx. 10 caracteres, por ejemplo: DAM2.\n⚠️ No uses el nombre de una hoja ya existente.\n\n',
+      'Introduce el CÓDIGO del horario:\n\n⚠️ Máx. 6 caracteres, por ejemplo: DAM2.\n⚠️ No uses el nombre de una hoja ya existente.\n\n',
       ui.ButtonSet.OK_CANCEL
     );
     codigoGrupo = respuesta.getResponseText().toUpperCase();

@@ -128,7 +128,7 @@ function m_CrearEventos() {
         const endDateTime = evento[PARAM.eventos.colEndDateTime - 1];
 
         // ⚠️ Si cadena vacía, split() devuelve un array que contiene una cadena vacía (en lugar de un array vacío)
-        const dias = evento[PARAM.eventos.colDias - 1].split(PARAM.eventos.separadorDias);
+        const dias = evento[PARAM.eventos.colDias - 1].toString().toUpperCase().split(PARAM.eventos.separadorDias);
         const descripcion = evento[PARAM.eventos.colDescripcion - 1];
 
         // ### AQUÍ LA GENERACIÓN DE EVENTOS ######
@@ -220,7 +220,7 @@ function m_CrearEventos() {
             //.setTimeZone(Session.getTimeZone())
             .addWeeklyRule()
             .onlyOnWeekdays(dias.map(dia => {
-              switch (dia) {
+              switch (dia.trim()) {
                 case 'L': return CalendarApp.Weekday.MONDAY; break;
                 case 'M': return CalendarApp.Weekday.TUESDAY; break;
                 case 'X': return CalendarApp.Weekday.WEDNESDAY; break;
