@@ -145,7 +145,7 @@ function leerDatosHoja(hoja, numFila = 1, numColumna = 1) {
 function actualizarDatosTabla(hoja, matriz, numFila = 1, numColumna = 1, borrarDatos = true, borrarFormato = false) {
 
   // Borrar datos previos de la tabla
-  if ((borrarDatos || borrarFormato) && hoja.getLastRow() >= numFila) {
+  if ((borrarDatos || borrarFormato) && hoja.getLastRow() >= numFila && hoja.getLastColumn() >= numColumna) {
     hoja.getDataRange()
       .offset(numFila - 1, numColumna - 1, hoja.getLastRow() - numFila + 1, hoja.getLastColumn() - numColumna + 1)
       .clear({ contentsOnly: borrarDatos, formatOnly: borrarFormato });
