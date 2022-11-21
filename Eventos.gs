@@ -208,7 +208,7 @@ function m_CrearEventos() {
           if (!evento[PARAM.eventos.colHoraFin - 1] || !endTime) throw '⭕ Falta hora fin';
           if (!evento[PARAM.eventos.colDiaFinRep - 1] || !endDateTime) throw '⭕ Falta fecha fin';
           if (endTime <= startTime) throw '⭕ Hora fin < hora inicio';
-          if (evento[PARAM.eventos.colDiaFinRep - 1] < evento[PARAM.eventos.colDiaInicioRep - 1]) throw '⭕ Día fin ≤ Día inicio';
+          if (evento[PARAM.eventos.colDiaFinRep - 1] < evento[PARAM.eventos.colDiaInicioRep - 1]) throw '⭕ Día fin < Día inicio';
           if (!dias[0]) throw '⭕ Falta días semana repetición';
 
           // ⚠️ Es necesario que el día de la semana de startTime coincida con uno de los indicados en la regla de recurrencia,

@@ -19,7 +19,7 @@ function m_ObtenerCalInstructores() {
   if (alerta('Se sobreescribirán los calendarios existentes.') == SpreadsheetApp.getUi().Button.OK) {
 
     const prefijo = hojaInstructores.getRange(PARAM.instructores.prefijo).getValue();
-    if (prefijo == '') alerta('¡No se ha introducido un prefijo en la celda B2!', SpreadsheetApp.getUi().ButtonSet.OK);
+    if (prefijo == '') alerta(`¡No se ha introducido un prefijo en la celda ${PARAM.instructores.prefijo}!`, SpreadsheetApp.getUi().ButtonSet.OK);
     else {
 
       mostrarMensaje('Buscando calendarios de instructores...');
