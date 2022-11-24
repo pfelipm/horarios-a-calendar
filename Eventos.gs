@@ -214,7 +214,7 @@ function m_CrearEventos() {
           // ⚠️ Es necesario que el día de la semana de startTime coincida con uno de los indicados en la regla de recurrencia,
           // de lo contrario se genera una repetición fantasma en el día indicado, aunque no forme parte de los usados en dicha
           // regla. ¡Esto no ocurre cuando se crean eventos periódicos manualmente desde Calendar!
-          // 👍 Con la fecha de finalización de la recurrencia no hay problema, las repeticiones finalizan cuando corresponde.
+          // 👍 Con la fecha de finalización de la recurrencia no hay problema, las repeticiones finalizan cuando corresponda.
 
           const recurrence = CalendarApp.newRecurrence()
             //.setTimeZone(Session.getTimeZone())
