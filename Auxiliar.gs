@@ -285,7 +285,7 @@ function conmutarChecks(hoja, filCheck, colCheck, numFilas, estado, mayoria = tr
  * 
  * @param   {string}  grupo               Código de grupo de la clase.
  * @param   {string}  clase               Código de la clase.
- * @param   {Object}  selloTiempoProceso  Objeto de la clase JS Date.
+ * @param   {Object}  selloTiempoProceso  Objeto de la clase JS Date (¡sin uso efectivo!).
  * 
  * @return  {number}  Número de filas / eventos eliminados
  */
@@ -417,7 +417,7 @@ function eliminarEventosPreviosRegistroMultiple(eventosFilas) {
 
   });
 
-  console.info(eventosRegistroEliminar);
+  // console.info(eventosRegistroEliminar);
 
   let eventosEliminados = 0;
   if (eventosRegistroEliminar.length > 0) {

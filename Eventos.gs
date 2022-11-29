@@ -117,7 +117,8 @@ function m_CrearEventos() {
         // Posible solución:
         //   - Leer valor de fecha normalmente con getValue() y de hora con getDisplayValue()
         //   - Combinar haciendo eventStart = new Date(fecha.setHours(fechaComoTexto.split(':')[0], fechaComoTexto.split(':')[1]))
-        // Paso de movidas y "monto" fecha + hora mediante fórmulas en la hoja de cálculo, eso me evita leer la tabla de dos modos distintos.
+        // Paso de movidas y "monto" fecha + hora mediante fórmulas en la hoja de cálculo, eso me evita leer la tabla de dos modos distintos,
+        // suponemos que llegan valores de fecha válidos (vía reglas de validación en hdc), en caso contrario usar xx instanceof Date
         const startTime = evento[PARAM.eventos.colStartTime - 1];
         const endTime = evento[PARAM.eventos.colEndTime - 1];
 
@@ -203,7 +204,7 @@ function m_CrearEventos() {
           // ### [5] Generación de evento recurrente en Google Calendar ###
           // ##############################################################
 
-          // Comprobaciones previas a la generación del evento (algunas ya se fuerzan en la hoja de gestión de eventos)
+          // Comprobaciones previas a la generación del evento, algunas ya se fuerzan en la hoja de gestión de eventos
           if (!evento[PARAM.eventos.colHoraInicio - 1] || !startTime) throw '⭕ Falta hora inicio';
           if (!evento[PARAM.eventos.colHoraFin - 1] || !endTime) throw '⭕ Falta hora fin';
           if (!evento[PARAM.eventos.colDiaFinRep - 1] || !endDateTime) throw '⭕ Falta fecha fin';
@@ -253,7 +254,7 @@ function m_CrearEventos() {
             idEvento: eventoCalendar.getId(),
             idCalendario: idCalendario,
             selloTiempo: new Date(),
-            // Esto tampoco se utiliza ya, se usaba cuando se borraban los eventos previosgenerado uno a uno
+            // Esto tampoco se utiliza ya, se usaba cuando se borraban los eventos previamente generados uno a uno
             // mensaje: previos > 0 ? `🟣 Evento actualizado [${previos}]` : '🟢 Evento creado',
             mensaje: '🟢 Evento generado',
             fila: eventoFila.fila
@@ -377,7 +378,7 @@ function m_EliminarEventos() {
 
         // Desmarcar selección, si se ha seleccionado esa opción...
         if (instanciasEliminadas > 0) {
-          eliminados++;
+          eliminados+= instanciasEliminadas;
           if (checkDesmarcar) hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colCheck, 1, 1).setValue(false);
         } else noHallados++;
 
