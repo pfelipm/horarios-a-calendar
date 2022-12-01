@@ -367,14 +367,25 @@ function m_EliminarEventos() {
         const evento = eventoFila.ajustes;
 
         const instanciasEliminadas = eliminarEventosPreviosRegistro(
+          
+          // Incluir únicamente estos campos hará que se eliminen también el resto de sesiones del mismo GRUPO y CLASE
           evento[PARAM.eventos.colGrupo - 1],
           evento[PARAM.eventos.colClase - 1],
-          selloTiempoProceso
+          
+          // Incluir estos campos adicionalmente no eliminará otras sesiones del mismo GRUPO y CLASE (la descripción se ignora)
+          evento[PARAM.eventos.colDias - 1],
+          evento[PARAM.eventos.colHoraInicio - 1],
+          evento[PARAM.eventos.colHoraFin - 1],
+          evento[PARAM.eventos.colInstructor - 1],
+          evento[PARAM.eventos.colAula - 1],
+          evento[PARAM.eventos.colDiaInicioRep - 1],
+          evento[PARAM.eventos.colDiaFinRep - 1]
+    
         );
 
         // Actualizar tabla (columnas Fecha proceso y Resultado)
         hojaEventos.getRange(PARAM.eventos.filEncabezado + eventoFila.fila, PARAM.eventos.colFechaProceso, 1, 2)
-          .setValues([[new Date(), instanciasEliminadas > 0 ? `✖️ Eliminado [${instanciasEliminadas}]` : '❔ No existe o ya eliminado']]);
+          .setValues([[new Date(), instanciasEliminadas > 0 ? `✖️ Evento eliminado [${instanciasEliminadas}]` : '⭕ Evento no encontrado']]);
 
         // Desmarcar selección, si se ha seleccionado esa opción...
         if (instanciasEliminadas > 0) {
@@ -391,7 +402,7 @@ function m_EliminarEventos() {
 
       // Resumen del resultado de la operación
       mostrarMensaje('Proceso terminado.', 5);
-      alerta('✖️ Eliminados: ' + eliminados + '\n❔ No existen / ya eliminados: ' + noHallados, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
+      alerta('✖️ Eliminados: ' + eliminados + '\n⭕ No encontrados: ' + noHallados, SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
 
     } else mostrarMensaje('No se han seleccionado clases.');
 
@@ -414,4 +425,12 @@ function m_EliminarResultados() {
     actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso);
   } else hojaActual.activate();
 
+}
+
+
+
+
+
+function foo() {
+       alerta('✖️ Eliminados: 9' + '\n⭕ No encontrados: 2', SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
 }

@@ -41,7 +41,7 @@ function m_nuevoHorario() {
       'Introduce el CÓDIGO del horario:\n\n⚠️ Máx. ' + PARAM.plantillaHorario.longMaxCodigo + ' caracteres, por ejemplo: DAM2.\n⚠️ No uses el nombre de una hoja ya existente.\n\n',
       ui.ButtonSet.OK_CANCEL
     );
-    codigoGrupo = respuesta.getResponseText().toUpperCase();
+    codigoGrupo = respuesta.getResponseText().toUpperCase().trim();
     boton = respuesta.getSelectedButton();
 
     // Verificar que el código es aceptable antes de intentar generar una nueva hoja con ese nombre
@@ -269,27 +269,34 @@ function conmutarChecks(hoja, filCheck, colCheck, numFilas, estado, mayoria = tr
 }
 
 /**
- * Busca cada ocurrencia del evento caracterizado por grupo y clase
- * en la tabla de la hoja de registro de eventos `PARAM.registro.hoja` y
- * si existe y su fecha de creación es anterior a `selloTiempoProceso`: 
+ * Busca cada ocurrencia de la sesión de clase cuyos detalles se pasan como
+ * parámetros en la tabla de la hoja de registro de eventos `PARAM.registro.hoja` y
+ * si existe: 
  * 
- *  1. Elimina el evento de calendario asociado.
- *  2. Elimina la fila de la hoja de registros en la que se encontraba.
+ *  1. Elimina el evento asociado en Google Calendar.
+ *  2. Elimina la fila de la hoja de registro en la que se encontraba.
  * 
- * (!) Cada par (Grupo, Clase) puede tener múltiples coincidencias en la tabla
- * de registro de eventos, correspondientes a distintas sesiones semanales.
+ * (!) En principio solo debería darse una ocurrencia para cada sesión de clase, pero
+ *     se buscan todas para eliminar posibles duplicados que solo pueden
+ *     fastidiarnos (el campo descripción no se tiene en cuenta).
  * 
  * ¡Cuidado! Esto podría eliminar de Calendar las clases del curso anterior,
  * si es que aún se mantuvieran en la tabla de registro de eventos (poco probable),
- * a menos que se diferenciaran de algún modo, por ejemplo sufijo curso en grupo (Ej: DAM2 22/23).
+ * a menos que se diferenciaran de algún modo, por ejemplo sufijo curso en grupo (Ej: DAM2 22).
  * 
  * @param   {string}  grupo               Código de grupo de la clase.
  * @param   {string}  clase               Código de la clase.
- * @param   {Object}  selloTiempoProceso  Objeto de la clase JS Date (¡sin uso efectivo!).
+ * @param   {string}  dias                Días semanales en que se imaprte la clase
+ * @param   {Object}  horaInicio          Hora de inicio de la clase
+ * @param   {Object}  horaFin             Hora de fin de la clase
+ * @param   {string}  instructor          Instructor asignado
+ * @param   {string}  aula                Aula asignada
+ * @param   {Object}  diaInicioRep        Fecha de inicio de la repetición
+ * @param   {Object}  diaFinRep           Fecha de fin de la repetición
  * 
  * @return  {number}  Número de filas / eventos eliminados
  */
-function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
+function eliminarEventosPreviosRegistro(grupo, clase, dias, horaInicio, horaFin, instructor, aula, diaInicioRep, diaFinRep) {
 
   const hojaRegistro = SpreadsheetApp.getActive().getSheetByName(PARAM.registro.hoja);
   const eventosRegistroEliminar = leerDatosHoja(hojaRegistro, PARAM.registro.filEncabezado + 1)
@@ -298,7 +305,13 @@ function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
       if (
         evento[PARAM.registro.colGrupo - 1] == grupo &&
         evento[PARAM.registro.colClase - 1] == clase &&
-        evento[PARAM.registro.colFechaProceso - 1] < selloTiempoProceso
+        evento[PARAM.registro.colDias - 1] == dias &&
+        evento[PARAM.registro.colHoraInicio - 1].getTime() == horaInicio.getTime() &&
+        evento[PARAM.registro.colHoraFin - 1].getTime() == horaFin.getTime() &&
+        evento[PARAM.registro.colInstructor - 1] == instructor &&
+        evento[PARAM.registro.colAula - 1] == aula &&
+        evento[PARAM.registro.colDiaInicioRep - 1].getTime() == diaInicioRep.getTime() &&
+        evento[PARAM.registro.colDiaFinRep - 1].getTime() == diaFinRep.getTime()
       ) {
         return [...listaEventos,
         {
@@ -345,11 +358,11 @@ function eliminarEventosPreviosRegistro(grupo, clase, selloTiempoProceso) {
  * que figuran en la tabla de clases a generar con los que se encuentran
  * en la hoja de registro de eventos `PARAM.registro.hoja` y si existe: 
  * 
- *  1. Elimina el evento de calendario asociado.
+ *  1. Elimina el evento asociado en Google Calendar.
  *  2. Elimina la fila de la hoja de registros en la que se encontraba.
  * 
  * (!) Cada par (Grupo, Clase) puede tener múltiples coincidencias en la tabla
- * de registro de eventos, correspondientes a distintas sesiones semanales.
+ *     de registro de eventos, correspondientes a distintas sesiones semanales.
  *
  * Se diferencia de `eliminarEventosPreviosRegistro`en que en este caso se
  * realiza el borrado de los eventos asociados a todas las clases de una vez,

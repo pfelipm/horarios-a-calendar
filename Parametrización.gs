@@ -91,6 +91,13 @@ const PARAM = {
     filEncabezado: 2,
     colGrupo: 1,
     colClase: 2,
+    colDias: 3,
+    colHoraInicio: 4,
+    colHoraFin: 5,
+    colInstructor: 6,
+    colAula: 7,
+    colDiaInicioRep: 8,
+    colDiaFinRep: 9, 
     colFechaProceso: 10,
     colIdEv: 11,
     colIdCal: 12
