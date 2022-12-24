@@ -4,7 +4,7 @@
 
 # Horarios-a-Calendar
 
-**Horarios a Calendar** (**HaC** en adelante) es un tinglado montado sobre **hojas de cálculo de Google** y **Apps Script** para facilitar la creación y gestión de eventos recurrentes en Google Calendar para las clases definidas mediante un tabla horaria semanal. Se ha diseñado con el objetivo de facilitar la generación y mantenimiento de calendarios docentes y de ocupación de aulas en el contexto de las actividades formativas de un centro de formación, aunque podría resultar también de utilidad en otros entornos.
+**Horarios a Calendar** (**HaC** en adelante) es un tinglado montado sobre **hojas de cálculo de Google** y **Apps Script** para facilitar la creación y gestión de eventos recurrentes en Google Calendar para representar un conjunto de sesiones de clase definidas mediante un tabla horaria semanal. Se ha diseñado con el objetivo de facilitar la generación y mantenimiento de calendarios docentes y de ocupación de aulas en el contexto de las actividades formativas de un centro de formación, aunque podría resultar también de utilidad en otros entornos.
 
 Es posible que hayas llegado aquí desde este artículo que explica los cómos y porqués de HaC, pero si no es el caso probablemente sea una buena idea que le eches un vistazo para entender qué problema pretende resolver HaC antes de seguir:
 
