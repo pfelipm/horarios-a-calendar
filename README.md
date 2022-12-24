@@ -19,6 +19,8 @@ El proceso a desarrollar se puede descomponer en varias partes para:
 5.  Desde una hoja de control se selecciona la hoja horaria cuyos clases desean generarse como eventos recurrentes en Google Calendar. También es posible tanto añadir sesiones de clase no presentes en la hoja del horario seleccionado, como prescindir totalmente de una horario ya existente e introducir manualmente la información de todas las sesiones de clase en esta hoja de control (aunque este no es el modo recomendado de funcionamiento).
 6.  Esta hoja de control permite seleccionar las clases para las que se desea generar eventos en Calendar. También es posible actualizarlos, tras realizar modificaciones en su definición, o eliminarlos, si es que ya han sido creados con anterioridad.
 
+![diagrama funcional HaC](https://docs.google.com/drawings/d/1UsJVHvxpDVvWrwY0m1xZ6re7UAttSVxxSoWjrnKuGZY/export/png)
+
 # Fx personalizada EXTRAEREVENTOS()
 
 ```
