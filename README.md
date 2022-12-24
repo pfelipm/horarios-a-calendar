@@ -1,18 +1,23 @@
 ![Banner horarios-a-calendar](https://user-images.githubusercontent.com/12829262/95454414-b43dd080-096c-11eb-99d1-854f66187e81.png)
-[![Creado con - Google Apps Script](https://img.shields.io/static/v1?label=Creado+con&message=Google+Apps+Script&color=blue&logo=GAS)](https://developers.google.com/apps-script)
+
+![Creado con - Google Apps Script](https://img.shields.io/static/v1?label=Creado+con&message=Google+Apps+Script&color=blue&logo=GAS)
+
 # Horarios-a-Calendar
 
-Un tinglado Google Apps Script que automatiza la creación y gestión de eventos en Google Calendar a partir de su definición horaria en formato tabla en una hoja de cálculo de Google. Se ha diseñado con el objetivo de facilitar la generación y mantenimiento de calendarios docentes y de ocupación de aulas en el contexto de las actividades formativas de un centro de formación, aunque podría resultar también de utilidad en otros entornos.
+**Horarios a Calendar** (**HaC** en adelante) es un tinglado montado sobre **hojas de cálculo de Google** y **Apps Script** para facilitar la creación y gestión de eventos recurrentes en Google Calendar para las clases definidas mediante un tabla horaria semanal. Se ha diseñado con el objetivo de facilitar la generación y mantenimiento de calendarios docentes y de ocupación de aulas en el contexto de las actividades formativas de un centro de formación, aunque podría resultar también de utilidad en otros entornos.
 
-**⚒️ En construcción** ⚒️
+Es posible que hayas llegado aquí desde este artículo que explica los cómos y porqués de HaC, pero si no es el caso probablemente sea una buena idea que le eches un vistazo para entender qué problema pretende resolver HaC antes de seguir:
 
-# Hoja de ruta
+:point\_right: [Eventos recurrentes en Google Calendar para tus horarios de clase con Apps Script y HaC](https://pablofelip.online/horarios-a-calendar/)
 
-Partiendo de una tabla - horario en un hoja de cálculo:
+El proceso a desarrollar se puede descomponer en varias partes para:
 
-1.  ✔️ Extraer los eventos (clases) utilizando la función de hojas de cálculo personalizada `EXTRAEREVENTOS()`, permitiendo la agrupación de las sesiones que se repiten en el mismo horario a lo largo de la semana. Utiliza la función `ACOPLAR()` para agrupar eventos en horarios semanales coincidentes, tal y como se facilita en el [repositorio desacoplar-acoplar](https://github.com/pfelipm/desacoplar-acoplar).
-2.  ⚒️ Integrar los eventos extraídos en un panel de gestión que posibilite su administración y gestión automatizada (generar, eliminar, actualizar, etc.).
-3.  ⚒️ Generar eventos en Google Calendar 🗓️ a partir de la tabla anterior mediante un script activado desde el menú de la hoja de cálculo (o tal vez con ejecución periódica).
+1.  La persona responsable de la generación de los horarios genera una copia de la plantilla de horario semanal facilitada e introduce en ella la información básica del horario: nombre del grupo, fecha de inicio y fin de las clases.
+2.  A continuación, introduce el nombre de cada clase (asignatura, materia o módulo profesional) en las celdas de la tabla horaria de la plantilla, tabla que dispone las sesiones de clase en días de la semana (columnas) y franjas horarias diarias (filas).
+3.  Se genera automáticamente una lista de sesiones de clase que las enumera y recoge su información característica (día de la semana, hora de inicio y fin) extraída en tiempo real a partir de la tabla horaria semanal, es decir, al mismo tiempo que se introducen en ella las clases. La automatización permite agrupar las sesiones de clase que se repiten en el mismo horario a lo largo de la semana, de manera opcional.
+4.  La persona responsable de la generación de los horarios establece los instructores y espacios (aulas) utilizados en cada sesión.
+5.  Desde una hoja de control se selecciona la hoja horaria cuyos clases desean generarse como eventos recurrentes en Google Calendar. También es posible tanto añadir sesiones de clase no presentes en la hoja del horario seleccionado, como prescindir totalmente de una horario ya existente e introducir manualmente la información de todas las sesiones de clase en esta hoja de control (aunque este no es el modo recomendado de funcionamiento).
+6.  Esta hoja de control permite seleccionar las clases para las que se desea generar eventos en Calendar. También es posible actualizarlos, tras realizar modificaciones en su definición, o eliminarlos, si es que ya han sido creados con anterioridad.
 
 # Fx personalizada EXTRAEREVENTOS()
 
