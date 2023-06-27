@@ -13,7 +13,7 @@
  *                        concatenan las etiquetas sin más.
  * @return Tabla de clases.
  *
- * @CustomFunction
+ * @customfunction
  *
  * MIT License
  * Copyright (c) 2020 Pablo Felip Monferrer(@pfelipm)
