@@ -62,7 +62,7 @@ function m_CrearEventos() {
       // eliminar eventos previos uno a uno dentro del bucle de generación no es buena idea puesto que
       // podrían producirse conflictos a la hora de reservar espacios, por ejemplo cuando dos sesiones
       // de distintas clases del mismo grupo que se imparten en la misma aula, cuyos eventos ya han sido
-      // generados previamente, intercambian horas y vuelve ha realizarse la generación con ese cambio.
+      // generados previamente, intercambian horas y vuelve a realizarse la generación con ese cambio.
       // ⚠️ La contrapartida es que los eventos ya existentes se eliminarán todos a la vez, aunque podría
       // ser que posteriomente no se generasen nuevas versiones por falta de datos o errores.
       mostrarMensaje('Eliminando eventos previos asociados a las clases ✖️...');

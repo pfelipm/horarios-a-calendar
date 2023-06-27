@@ -53,7 +53,7 @@ function m_nuevoHorario() {
       const hojaPlantilla = hdc.getSheetByName(PARAM.plantillaHorario.hoja);
       const nuevaHoja = hdc.insertSheet(0, { template: hojaPlantilla }).setName(codigoGrupo);
 
-      // Perrellenar celda con el código de la clase
+      // Prerellenar celda con el código de la clase
       nuevaHoja.getRange(PARAM.plantillaHorario.codigoGrupo).setValue(codigoGrupo);
 
       // Replicar la protección de celdas aplicada sobre la plantilla de horario en la nueva hoja de horario semanal
@@ -364,7 +364,7 @@ function eliminarEventosPreviosRegistro(grupo, clase, dias, horaInicio, horaFin,
  * (!) Cada par (Grupo, Clase) puede tener múltiples coincidencias en la tabla
  *     de registro de eventos, correspondientes a distintas sesiones semanales.
  *
- * Se diferencia de `eliminarEventosPreviosRegistro`en que en este caso se
+ * Se diferencia de `eliminarEventosPreviosRegistro` en que en este caso se
  * realiza el borrado de los eventos asociados a todas las clases de una vez,
  * en lugar de una a una a medida que se procesa cada clase en la tabla de
  * generación.
