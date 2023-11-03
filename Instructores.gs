@@ -13,7 +13,7 @@ function m_ObtenerCalInstructores() {
 
   // Nos movemos a la hoja de gestión de instructores antes de solicitar confirmación
   const hojaActual = SpreadsheetApp.getActiveSheet();
-  hojaInstructores = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
+  const hojaInstructores = SpreadsheetApp.getActive().getSheetByName(PARAM.instructores.hoja).activate();
   SpreadsheetApp.flush();
 
   if (alerta('Se sobreescribirán los calendarios existentes.') == SpreadsheetApp.getUi().Button.OK) {

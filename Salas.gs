@@ -11,7 +11,7 @@ function m_ObtenerSalas() {
 
   // Nos movemos a la hoja de gestión de salas antes de solicitar confirmación
   const hojaActual = SpreadsheetApp.getActiveSheet();
-  hojaSalas = SpreadsheetApp.getActive().getSheetByName(PARAM.salas.hoja).activate();
+  const hojaSalas = SpreadsheetApp.getActive().getSheetByName(PARAM.salas.hoja).activate();
   SpreadsheetApp.flush();
 
   if (alerta('Se sobreescribirán las salas existentes.') == SpreadsheetApp.getUi().Button.OK) {
