@@ -4,11 +4,16 @@
  * Una herramienta que te ayuda a transformar horarios de clase en eventos *
  * recurrentes en Google Calendar.                                         *
  *                                                                         *
- * Copyright (C) Pablo Felip (@pfelipm) v1.0 NOV 2022                      *
+ * Copyright (C) Pablo Felip (@pfelipm) v1.11 OCT 2024                      *
  * Se distribuye bajo licencia GNU GPL v3.                                 *
  *                                                                         *
  ***************************************************************************
  *
+ * 16/10/24 v1.11 | Pequeños ajustes cosméticos:
+ *   - Comandos de menú para descargar calendarios de docentes y aulas renombrados ("Obtener...").
+ *   - Texto "Última ejecución" renombrado a "Última obtención" en hojas 👥 Instructores y 🏫 Salas.
+ *   - Nota sobre hoja 👥 Instructores → E5 para indicar que solo se descargan calendarios visibles en la lista.
+ * 
  * @OnlyCurrentDoc
  */
 
@@ -19,7 +24,7 @@
 const PARAM = {
 
   nombre: 'HaC',
-  version: 'Versión 1.1 (noviembre 2022)',
+  version: 'Versión 1.11 (octubre 2024)',
   icono: '🗓️',
   urlRepoGitHub: 'https://github.com/pfelipm/horarios-a-calendar',
   propiedadEstadoCheck: 'estadoCheck01',

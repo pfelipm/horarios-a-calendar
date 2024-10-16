@@ -15,8 +15,8 @@ function onOpen() {
     .addSeparator()
     .addItem('⏰ Crear nuevo horario semanal', 'm_nuevoHorario')
     .addSeparator()
-    .addItem('👥 Buscar calendarios instructores', 'm_ObtenerCalInstructores')
-    .addItem('🏫 Buscar salas', 'm_ObtenerSalas')
+    .addItem('👥 Obtener calendarios instructores', 'm_ObtenerCalInstructores')
+    .addItem('🏫 Obtener salas', 'm_ObtenerSalas')
     .addSeparator()
     .addItem(`💡 Acerca de ${PARAM.nombre}`, 'm_acercaDe')
     .addToUi();
