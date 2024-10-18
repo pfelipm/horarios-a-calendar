@@ -400,7 +400,7 @@ function eliminarEventosPreviosRegistroMultiple(eventosFilas) {
     if (!clasesYaProcesadas.has(claveUnica)) {
 
       // Recorremos la tabla de eventos registrados buscando todos los del mismo grupo y clase que el que se desea eliminar
-      const filasEliminar = eventosRegistro.reduce((filasEliminar, evento) => {
+      const filasEliminar = eventosRegistro.reduce( (filasEliminar, evento, indiceFila) => {
 
         if (
           evento.ajustes[PARAM.registro.colGrupo - 1] == eventoFila.ajustes[PARAM.eventos.colGrupo - 1] &&
@@ -414,7 +414,14 @@ function eliminarEventosPreviosRegistroMultiple(eventosFilas) {
               idCalendario: evento.ajustes[PARAM.registro.colIdCal - 1]
             }
           );
-          return [...filasEliminar, evento.fila];
+          
+          // El resultado final del reduce incluye los índices a las filas a eliminar correspondientes al
+          // evento analizado en cada iteración en el eventosfilas.forEach() que analiza los eventos que
+          // deben eliminarse antes de ser creados de nuevo. No es posible utilizar "evento.fila" en lugar
+          // "indiceFila" para el borrado puesto que esos son los valores numéricos de la matriz original
+          // de eventos en la hoja de registro y a medida que se fueran eliminado en distintas iteraciones
+          // podrían no apuntar al lugar correcto al indexar en "eventosRegistro".
+          return [...filasEliminar, indiceFila];
         }
         return filasEliminar;
 

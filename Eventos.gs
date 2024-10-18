@@ -78,7 +78,7 @@ function m_CrearEventos() {
       // ######################################
       //
       // [1] Construir título de los eventos.
-      // [2] Obtener valores de echas / hora de inicio y fin.
+      // [2] Obtener valores de fechas / hora de inicio y fin.
       // [3] Obtener calendario público del instructor y opcionalmente privado para enviar invitación
       // [4] OPCIONAL: Obtener sala a reservar.
       // [5] Construir y generar el evento de clase en Google Calendar.
@@ -425,12 +425,4 @@ function m_EliminarResultados() {
     actualizarDatosTabla(hojaEventos, null, PARAM.eventos.filEncabezado + 1, PARAM.eventos.colFechaProceso);
   } else hojaActual.activate();
 
-}
-
-
-
-
-
-function foo() {
-       alerta('✖️ Eliminados: 9' + '\n⭕ No encontrados: 2', SpreadsheetApp.getUi().ButtonSet.OK, 'Eventos procesados');
 }
