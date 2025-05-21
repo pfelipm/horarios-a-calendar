@@ -111,7 +111,7 @@ Esta arquitectura modular y basada en los servicios de Google permite que **Hora
 # Fx personalizada EXTRAEREVENTOS()
 
 ```
-=EXTRAEREVENTOS( intervalo_horario ; [agrupar]; [separador] ) 
+=EXTRAEREVENTOS( intervalo_horario ; [agrupar] ; [separador] ) 
 ```
 
 *   `intervalo_horario`: Intervalo de datos que contiene el horario en el formato requerido: fila 1 (etiqueta de cada sesión, típicamente los **días de la semana**), columna inicial (**hora de inicio del evento**), columna final (**hora de fin del evento**), celdas (**descripción del evento**). Se requiere que cada franja horaria (fila) disponga de indicación de la hora de inicio y fin de cada sesión y no se combinen las celdas en el interior de la tabla.
